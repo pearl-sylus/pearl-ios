@@ -120,6 +120,10 @@ final class HealthProbeModel: ObservableObject {
                                           quantitySamplePredicate: predicate,
                                           options: option) { _, statistics, error in
                 if let error {
+                    if (error as? HKError)?.code == .errorNoData {
+                        continuation.resume(returning: nil)
+                        return
+                    }
                     continuation.resume(throwing: error)
                     return
                 }
@@ -164,6 +168,10 @@ final class HealthProbeModel: ObservableObject {
                                       limit: HKObjectQueryNoLimit,
                                       sortDescriptors: nil) { _, samples, error in
                 if let error {
+                    if (error as? HKError)?.code == .errorNoData {
+                        continuation.resume(returning: [])
+                        return
+                    }
                     continuation.resume(throwing: error)
                     return
                 }
