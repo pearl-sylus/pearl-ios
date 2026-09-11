@@ -12,12 +12,6 @@ struct PearlApp: App {
 
 private struct RootView: View {
     var body: some View {
-        TabView {
-            ChatView()
-                .tabItem { Label("说话", systemImage: "bubble.left.and.bubble.right.fill") }
-
-            WebHomeView(url: ChatAPI.baseURL)
-                .tabItem { Label("家", systemImage: "house.fill") }
-        }
+        WebHomeView(url: ChatAPI.baseURL)
     }
 }
