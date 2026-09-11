@@ -13,6 +13,7 @@
 		A20000000000000000000005 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000005 /* ChatView.swift */; };
 		A20000000000000000000006 /* WebHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* WebHomeView.swift */; };
 		A20000000000000000000007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000008 /* Assets.xcassets */; };
+		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +26,8 @@
 		A10000000000000000000006 /* WebHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebHomeView.swift; sourceTree = "<group>"; };
 		A10000000000000000000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A10000000000000000000008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A10000000000000000000009 /* HealthProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthProbe.swift; sourceTree = "<group>"; };
+		A1000000000000000000000A /* Pearl.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pearl.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +57,9 @@
 				A10000000000000000000004 /* ChatViewModel.swift */,
 				A10000000000000000000005 /* ChatView.swift */,
 				A10000000000000000000006 /* WebHomeView.swift */,
+				A10000000000000000000009 /* HealthProbe.swift */,
 				A10000000000000000000007 /* Info.plist */,
+				A1000000000000000000000A /* Pearl.entitlements */,
 				A10000000000000000000008 /* Assets.xcassets */,
 			);
 			path = Pearl;
@@ -94,7 +99,12 @@
 				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
-					A40000000000000000000001 = { CreatedOnToolsVersion = 26.0; };
+					A40000000000000000000001 = {
+						CreatedOnToolsVersion = 26.0;
+						SystemCapabilities = {
+							com.apple.HealthKit = { enabled = 1; };
+						};
+					};
 				};
 			};
 			buildConfigurationList = A70000000000000000000000 /* Build configuration list for PBXProject "Pearl" */;
@@ -132,6 +142,7 @@
 				A20000000000000000000004 /* ChatViewModel.swift in Sources */,
 				A20000000000000000000005 /* ChatView.swift in Sources */,
 				A20000000000000000000006 /* WebHomeView.swift in Sources */,
+				A20000000000000000000008 /* HealthProbe.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,6 +183,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Pearl/Pearl.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -192,6 +204,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Pearl/Pearl.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;

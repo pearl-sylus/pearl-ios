@@ -11,7 +11,13 @@ struct PearlApp: App {
 }
 
 private struct RootView: View {
+    @StateObject private var health = HealthProbeModel()
+    @State private var isShowingHealthProbe = true
+
     var body: some View {
         WebHomeView(url: ChatAPI.baseURL)
+            .sheet(isPresented: $isShowingHealthProbe) {
+                HealthProbeView(model: health)
+            }
     }
 }
