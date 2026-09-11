@@ -1,0 +1,32 @@
+name: Build unsigned iOS app
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          xcodebuild \
+            -project ios/Pearl/Pearl.xcodeproj \
+            -scheme Pearl \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+      - name: Package IPA
+        run: |
+          mkdir -p build/package/Payload
+          cp -R build/DerivedData/Build/Products/Release-iphoneos/Pearl.app build/package/Payload/
+          cd build/package
+          ditto -c -k --sequesterRsrc --keepParent Payload Pearl-unsigned.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Pearl-unsigned
+          path: build/package/Pearl-unsigned.ipa
+          if-no-files-found: error
