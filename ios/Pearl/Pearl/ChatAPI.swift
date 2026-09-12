@@ -99,6 +99,10 @@ struct ChatAPI {
         try JSONDecoder().decode(HomeDashboard.self, from: await data(for: URLRequest(url: url("/api/dash"))))
     }
 
+    func days() async throws -> DaysResponse {
+        try JSONDecoder().decode(DaysResponse.self, from: await data(for: URLRequest(url: url("/api/days"))))
+    }
+
     func setPipeValue(key: String, value: Any) async throws {
         try await post("/api/chat/pipe-config", body: ["key": key, "value": value])
     }

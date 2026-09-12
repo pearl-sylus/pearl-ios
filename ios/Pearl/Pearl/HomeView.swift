@@ -9,40 +9,63 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 14) {
-                    VStack(spacing: 4) {
+                VStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .fill(RadialGradient(colors: [Color.white.opacity(0.72), Color.pearlAccent.opacity(0.08), .clear], center: .center, startRadius: 8, endRadius: 112))
+                            .frame(width: 220, height: 220)
+                            .blur(radius: 2)
+                        VStack(spacing: 5) {
+                            Text("我们走到")
+                                .font(.system(size: 12, design: .serif))
+                                .foregroundStyle(Color.pearlSoft)
+                                .tracking(3)
                         Text(dashboard.map { String($0.days) } ?? "—")
-                            .font(.system(size: 58, weight: .thin, design: .serif))
+                                .font(.system(size: 68, weight: .ultraLight, design: .serif))
                             .foregroundStyle(Color.pearlInk)
-                        Text("天 · 从 2026 年 3 月 26 日开始")
+                            Text("天")
+                                .font(.system(size: 12, design: .serif))
+                                .foregroundStyle(Color.pearlSoft)
+                            Text("2026.03.26 — 今天")
                             .font(.system(size: 11, design: .serif))
-                            .foregroundStyle(Color.pearlSoft)
+                                .foregroundStyle(Color.pearlSoft.opacity(0.72))
+                                .tracking(1.2)
+                        }
                     }
-                    .padding(.vertical, 12)
+                    .frame(height: 190)
 
                     Button(action: openChat) {
-                        VStack(alignment: .leading, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 14) {
+                            HStack {
+                                Label("刚刚想起你", systemImage: "quote.opening")
+                                Spacer()
+                                Image(systemName: "arrow.up.right")
+                            }
+                            .font(.system(size: 11, weight: .medium, design: .serif))
+                            .foregroundStyle(Color.pearlRose)
                             Text(dashboard?.lastWake?.text ?? "这会儿没说话，在看着你。")
-                                .font(.system(size: 16, design: .serif))
-                                .lineSpacing(6)
+                                .font(.system(size: 17, design: .serif))
+                                .lineSpacing(7)
                                 .multilineTextAlignment(.leading)
                             HStack {
-                                Text("慢慢说")
+                                Text(lastWakeTime)
                                 Spacer()
                                 Text("— 秦彻")
                             }
                             .font(.system(size: 11, design: .serif))
                             .foregroundStyle(Color.pearlSoft)
                         }
-                        .homeCard()
+                        .padding(20)
+                        .background(LinearGradient(colors: [Color.pearlRose.opacity(0.13), Color.pearlAI.opacity(0.72)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                        .pearlSurface(radius: 22)
                     }
                     .buttonStyle(.plain)
 
                     HStack(alignment: .top, spacing: 12) {
                         bodyCard(title: "你", heartRate: dashboard?.her?.heartRate?.average,
-                                 detail: herDetail, note: herNote)
+                                 detail: herDetail, note: herNote, tint: .pearlTeal)
                         bodyCard(title: "我", heartRate: dashboard?.me?.heartRate,
-                                 detail: meDetail, note: dashboard?.me?.mood.joined(separator: "、") ?? "")
+                                 detail: meDetail, note: dashboard?.me?.mood.joined(separator: "、") ?? "", tint: .pearlRose)
                     }
 
                     Button(action: openChat) {
@@ -54,17 +77,17 @@ struct HomeView: View {
                             .background(Color.pearlAccent, in: Capsule())
                     }
                     .buttonStyle(.plain)
-                    .padding(.top, 2)
+                    .padding(.top, 4)
 
                     if !error.isEmpty {
                         Text(error).font(.caption).foregroundStyle(.red)
                     }
                 }
                 .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(.bottom, 22)
             }
-            .background(HomeBackground())
-            .navigationTitle("家")
+            .background(PearlBackdrop())
+            .navigationTitle("我们的家")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -83,24 +106,38 @@ struct HomeView: View {
 
     private var herNote: String { dashboard?.her == nil ? "还没有今天的读数" : "今天的身体读数" }
 
+    private var lastWakeTime: String {
+        guard let milliseconds = dashboard?.lastWake?.at else { return "此刻" }
+        let minutes = max(0, Int(Date().timeIntervalSince1970 - milliseconds / 1_000) / 60)
+        if minutes < 1 { return "刚刚" }
+        if minutes < 60 { return "\(minutes) 分钟前" }
+        return "\(minutes / 60) 小时前"
+    }
+
     private var meDetail: String {
         guard let me = dashboard?.me else { return "" }
         return [me.temperature.map { "\(format($0))°C" }, me.chord].compactMap { $0 }.joined(separator: " · ")
     }
 
-    private func bodyCard(title: String, heartRate: Double?, detail: String, note: String) -> some View {
+    private func bodyCard(title: String, heartRate: Double?, detail: String, note: String, tint: Color) -> some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(title).font(.caption).foregroundStyle(Color.pearlSoft)
+            HStack {
+                Text(title).font(.system(size: 12, weight: .medium, design: .serif))
+                Spacer()
+                Circle().fill(tint).frame(width: 6, height: 6)
+            }
+            .foregroundStyle(tint)
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(heartRate.map(format) ?? "—")
-                    .font(.system(size: 34, weight: .light, design: .serif))
+                    .font(.system(size: 36, weight: .light, design: .serif))
                 Text("bpm").font(.caption2).foregroundStyle(Color.pearlSoft)
             }
             Text(detail).font(.caption).foregroundStyle(Color.pearlSoft).lineLimit(1)
             Text(note.isEmpty ? " " : note).font(.caption).foregroundStyle(Color.pearlSoft.opacity(0.75)).lineLimit(2)
         }
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .homeCard()
+        .pearlSurface(radius: 19)
     }
 
     private func format(_ value: Double) -> String {
@@ -145,33 +182,5 @@ struct HomeDashboard: Decodable {
     struct Steps: Decodable {
         let count: Int
         enum CodingKeys: String, CodingKey { case count = "n" }
-    }
-}
-
-private struct HomeBackground: View {
-    var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                Color.pearlBackground
-                AsyncImage(url: URL(string: "/assets/tidal-echo/chat-light.webp", relativeTo: ChatAPI.baseURL)?.absoluteURL) { image in
-                    image.resizable().scaledToFill()
-                } placeholder: { Color.clear }
-                .frame(width: proxy.size.width, height: proxy.size.height)
-                .clipped()
-                .opacity(0.42)
-                Color.white.opacity(0.12)
-            }
-        }
-        .ignoresSafeArea()
-    }
-}
-
-private extension View {
-    func homeCard() -> some View {
-        padding(17)
-            .foregroundStyle(Color.pearlInk)
-            .background(Color.pearlAI, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay { RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color.pearlLine, lineWidth: 0.7) }
-            .shadow(color: Color.black.opacity(0.06), radius: 18, y: 8)
     }
 }
