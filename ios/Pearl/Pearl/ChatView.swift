@@ -2,6 +2,7 @@ import AVFoundation
 import Foundation
 import PhotosUI
 import SwiftUI
+import UIKit
 import WebKit
 
 struct ChatView: View {
@@ -74,20 +75,34 @@ struct ChatView: View {
                     }
                     .accessibilityLabel("聊天设置，记忆水位 \(model.contextPercent)%")
                 }
+                ToolbarItem(placement: .principal) {
+                    VStack(spacing: 1) {
+                        Text("慢慢说")
+                            .font(.system(size: 18, weight: .medium, design: .serif))
+                            .foregroundStyle(Color.pearlInk)
+                        Text(model.status.isEmpty ? "你说，我听着。" : model.status)
+                            .font(.system(size: 10.5, design: .serif))
+                            .foregroundStyle(Color.pearlSoft)
+                            .lineLimit(1)
+                    }
+                }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button { showHistory = true } label: {
                         Image(systemName: "clock.arrow.circlepath")
                     }
                     Button { showControls = true } label: {
-                        Image(systemName: "slider.horizontal.3")
+                        Circle()
+                            .fill(AngularGradient(colors: [.blue.opacity(0.55), .pink.opacity(0.45), .orange.opacity(0.45), .mint.opacity(0.5), .blue.opacity(0.55)], center: .center))
+                            .frame(width: 29, height: 29)
+                            .overlay(Image(systemName: "slider.horizontal.3").font(.system(size: 11, weight: .medium)).foregroundStyle(.white))
                     }
+                    .accessibilityLabel("聊天设置")
                 }
             }
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 4) {
-                    if !model.status.isEmpty {
-                        Text(model.status).font(.caption).foregroundStyle(.secondary)
-                    }
                     if !model.error.isEmpty {
                         Text(model.error).font(.caption).foregroundStyle(.red).lineLimit(2)
                     }
@@ -129,14 +144,32 @@ private struct ChatBackground: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        LinearGradient(
-            colors: scheme == .dark
-                ? [Color(red: 0.08, green: 0.075, blue: 0.07), Color(red: 0.13, green: 0.11, blue: 0.10)]
-                : [Color(red: 0.97, green: 0.955, blue: 0.95), Color(red: 0.93, green: 0.95, blue: 0.97)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        GeometryReader { proxy in
+            ZStack {
+                Color.pearlBackground
+                AsyncImage(url: wallpaperURL) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    Color.clear
+                }
+                .frame(width: proxy.size.width, height: proxy.size.height)
+                .clipped()
+                .opacity(scheme == .dark ? 0.28 : 0.50)
+                LinearGradient(
+                    colors: scheme == .dark
+                        ? [Color.black.opacity(0.54), Color.black.opacity(0.68)]
+                        : [Color.white.opacity(0.18), Color.white.opacity(0.05), Color.pearlBackground.opacity(0.20)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
+        }
         .ignoresSafeArea()
+    }
+
+    private var wallpaperURL: URL? {
+        URL(string: scheme == .dark ? "/assets/tidal-echo/chat-harbor.webp" : "/assets/tidal-echo/chat-light.webp",
+            relativeTo: ChatAPI.baseURL)?.absoluteURL
     }
 }
 
@@ -162,8 +195,8 @@ private struct MessageRow: View {
                 Text(message.date, format: .dateTime.month(.twoDigits).day(.twoDigits).hour().minute())
                 if let cache = message.cache, !message.isMine { Text("⚡\(cache)%") }
             }
-            .font(.caption2)
-            .foregroundStyle(.tertiary)
+            .font(.system(size: 9, design: .serif))
+            .foregroundStyle(Color.pearlSoft.opacity(0.65))
             .padding(.horizontal, 5)
         }
         .frame(maxWidth: .infinity, alignment: message.isMine ? .trailing : .leading)
@@ -285,18 +318,17 @@ private struct Bubble: View {
                     .frame(width: 2, height: 17).opacity(0.7)
             }
         }
-        .foregroundStyle(mine ? Color.white : Color.primary)
+        .foregroundStyle(Color.pearlInk)
         .padding(.horizontal, 13)
-        .padding(.vertical, 9)
-        .background(mine ? AnyShapeStyle(Color(red: 0.76, green: 0.20, blue: 0.17)) : AnyShapeStyle(Material.thin),
-                    in: RoundedRectangle(cornerRadius: 19, style: .continuous))
+        .padding(.vertical, 8)
+        .background(mine ? Color.pearlMine : Color.pearlAI,
+                    in: RoundedRectangle(cornerRadius: 15, style: .continuous))
         .overlay {
-            if !mine {
-                RoundedRectangle(cornerRadius: 19, style: .continuous)
-                    .stroke(.white.opacity(0.18), lineWidth: 0.5)
-            }
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .stroke(Color.pearlLine.opacity(0.55), lineWidth: 0.5)
         }
-        .frame(maxWidth: 320, alignment: mine ? .trailing : .leading)
+        .shadow(color: Color.black.opacity(0.055), radius: 14, y: 7)
+        .frame(maxWidth: 280, alignment: mine ? .trailing : .leading)
     }
 }
 
@@ -318,7 +350,8 @@ private struct RichMessageText: View {
                 Text((try? AttributedString(markdown: plain,
                                             options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                      ?? AttributedString(plain))
-                    .font(.body)
+                    .font(.system(size: 14, design: .serif))
+                    .lineSpacing(3)
                     .textSelection(.enabled)
             }
             if let music {
@@ -443,11 +476,11 @@ private struct ThoughtDisclosure: View {
             }
             .padding(.top, 5)
         } label: {
-            Label(cutWarning ? "他想过 ⚠" : "他想过", systemImage: "sparkles")
-                .font(.caption).foregroundStyle(.secondary)
+            Text(cutWarning ? "✦ 他想过 ⚠" : "✦ 他想过")
+                .font(.system(size: 11.5, design: .serif)).foregroundStyle(Color.pearlSoft)
         }
         .padding(.horizontal, 9)
-        .frame(maxWidth: 320, alignment: .leading)
+        .frame(maxWidth: 280, alignment: .leading)
     }
 
     private var cutWarning: Bool { cut != nil && cut != "display" }
@@ -740,43 +773,54 @@ private struct ComposerView: View {
                 }
             }
 
-            HStack(alignment: .bottom, spacing: 7) {
-                PhotosPicker(selection: $pickedPhotos, maxSelectionCount: 3, matching: .images) {
-                    Image(systemName: "photo").frame(width: 30, height: 34)
-                }
-                .disabled(model.pendingImages.count >= 3)
-
-                Button { model.toggleRecording() } label: {
-                    Group {
-                        if model.isSendingVoice { ProgressView() }
-                        else { Image(systemName: model.isRecording ? "waveform.circle.fill" : "mic") }
+            HStack(alignment: .bottom, spacing: 6) {
+                HStack(alignment: .bottom, spacing: 5) {
+                    PhotosPicker(selection: $pickedPhotos, maxSelectionCount: 3, matching: .images) {
+                        Image(systemName: "paperclip").frame(width: 29, height: 34)
                     }
-                    .foregroundStyle(model.isRecording ? Color.red : Color.primary)
-                    .frame(width: 30, height: 34)
-                }
-                .accessibilityLabel(model.isRecording ? "结束并发送录音" : "录音")
+                    .disabled(model.pendingImages.count >= 3)
 
-                TextField(model.isRecording ? "正在录音…" : "把想说的放进来", text: $model.draft, axis: .vertical)
-                    .lineLimit(1...6).focused($focused).padding(.vertical, 8)
-                    .disabled(model.isRecording)
-
-                if model.isRecording {
-                    Button { model.cancelRecording() } label: {
-                        Image(systemName: "xmark").frame(width: 34, height: 34)
+                    Button { model.toggleRecording() } label: {
+                        Group {
+                            if model.isSendingVoice { ProgressView() }
+                            else { Image(systemName: model.isRecording ? "waveform.circle.fill" : "mic") }
+                        }
+                        .foregroundStyle(model.isRecording ? Color.red : Color.pearlAccent)
+                        .frame(width: 29, height: 34)
                     }
-                    .accessibilityLabel("取消录音")
-                } else {
+                    .accessibilityLabel(model.isRecording ? "结束并发送录音" : "录音")
+
+                    TextField(model.isRecording ? "正在录音…" : "把想说的放进来", text: $model.draft, axis: .vertical)
+                        .font(.system(size: 15, design: .serif))
+                        .foregroundStyle(Color.pearlInk)
+                        .lineLimit(1...6).focused($focused).padding(.vertical, 8)
+                        .disabled(model.isRecording)
+
+                    if model.isRecording {
+                        Button { model.cancelRecording() } label: {
+                            Image(systemName: "xmark").frame(width: 34, height: 34)
+                        }
+                        .accessibilityLabel("取消录音")
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.pearlField, in: Capsule())
+                .overlay { Capsule().stroke(Color.pearlLine, lineWidth: 0.7) }
+                .shadow(color: Color.black.opacity(0.09), radius: 18, y: 8)
+
+                if !model.isRecording {
                     Button { Task { await model.sendOrStop() } } label: {
                         Image(systemName: model.isStreaming && model.draft.isEmpty && model.pendingImages.isEmpty ? "stop.fill" : "arrow.up")
                             .font(.system(size: 15, weight: .bold)).foregroundStyle(.white)
-                            .frame(width: 34, height: 34).background(Color.accentColor, in: Circle())
+                            .frame(width: 42, height: 42).background(Color.pearlAccent, in: Circle())
+                            .shadow(color: Color.black.opacity(0.15), radius: 12, y: 6)
                     }
                     .buttonStyle(.plain).disabled(!canSend).opacity(canSend ? 1 : 0.45)
                 }
             }
         }
-        .padding(8)
-        .adaptiveGlass(cornerRadius: 25)
+        .padding(.vertical, 7)
         .onChange(of: pickedPhotos) { items in
             Task {
                 for item in items.prefix(max(0, 3 - model.pendingImages.count)) {
@@ -943,21 +987,5 @@ private extension Array where Element == String {
     func uniqued() -> [String] {
         var seen = Set<String>()
         return filter { seen.insert($0).inserted }
-    }
-}
-
-private extension View {
-    @ViewBuilder
-    func adaptiveGlass(cornerRadius: CGFloat) -> some View {
-        if #available(iOS 26.0, *) {
-            glassEffect(in: .rect(cornerRadius: cornerRadius))
-        } else {
-            background(.ultraThinMaterial,
-                       in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .stroke(.white.opacity(0.25), lineWidth: 0.6)
-                }
-        }
     }
 }
