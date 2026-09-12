@@ -11,9 +11,9 @@
 		A20000000000000000000003 /* ChatAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000003 /* ChatAPI.swift */; };
 		A20000000000000000000004 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000004 /* ChatViewModel.swift */; };
 		A20000000000000000000005 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000005 /* ChatView.swift */; };
-		A20000000000000000000006 /* WebHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* WebHomeView.swift */; };
 		A20000000000000000000007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000008 /* Assets.xcassets */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
+		A20000000000000000000009 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000000B /* HomeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,11 +23,11 @@
 		A10000000000000000000003 /* ChatAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAPI.swift; sourceTree = "<group>"; };
 		A10000000000000000000004 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 		A10000000000000000000005 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
-		A10000000000000000000006 /* WebHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebHomeView.swift; sourceTree = "<group>"; };
 		A10000000000000000000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A10000000000000000000008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000000000000000000009 /* HealthProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthProbe.swift; sourceTree = "<group>"; };
 		A1000000000000000000000A /* Pearl.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pearl.entitlements; sourceTree = "<group>"; };
+		A1000000000000000000000B /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,7 +56,7 @@
 				A10000000000000000000003 /* ChatAPI.swift */,
 				A10000000000000000000004 /* ChatViewModel.swift */,
 				A10000000000000000000005 /* ChatView.swift */,
-				A10000000000000000000006 /* WebHomeView.swift */,
+				A1000000000000000000000B /* HomeView.swift */,
 				A10000000000000000000009 /* HealthProbe.swift */,
 				A10000000000000000000007 /* Info.plist */,
 				A1000000000000000000000A /* Pearl.entitlements */,
@@ -141,8 +141,8 @@
 				A20000000000000000000003 /* ChatAPI.swift in Sources */,
 				A20000000000000000000004 /* ChatViewModel.swift in Sources */,
 				A20000000000000000000005 /* ChatView.swift in Sources */,
-				A20000000000000000000006 /* WebHomeView.swift in Sources */,
 				A20000000000000000000008 /* HealthProbe.swift in Sources */,
+				A20000000000000000000009 /* HomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -225,7 +225,7 @@ private struct MessageRow: View {
             if let images = message.img, !images.isEmpty {
                 Bubble(text: "", mine: false, images: images)
             }
-            ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
+            ForEach(Array(displaySegments(segments).enumerated()), id: \.offset) { _, segment in
                 if segment.k == "t" {
                     Bubble(text: segment.s, mine: false, images: [])
                 } else {
@@ -240,7 +240,7 @@ private struct MessageRow: View {
                    album: message.album)
             if !message.isMine, let tools = message.tools, !tools.isEmpty {
                 ToolBlock(text: (message.toolNotes?.joined(separator: "\n") ?? tools.joined(separator: " · ")),
-                          overrideLabel: tools.map(ToolPresentation.shortName).uniqued().joined(separator: " · "))
+                          overrideLabel: (message.toolNotes ?? tools).map(ToolPresentation.shortName).uniqued().joined(separator: " · "))
             }
         }
     }
@@ -250,6 +250,14 @@ private struct MessageRow: View {
         if let due = message.due { pieces.append("原定 \(clock(due))") }
         if let next = message.next { pieces.append("下一只 \(clock(next))") }
         return pieces.filter { !$0.isEmpty }.joined(separator: " · ")
+    }
+
+    private func displaySegments(_ segments: [ChatSegment]) -> [ChatSegment] {
+        var alarmNotes = (message.toolNotes ?? []).filter(ToolPresentation.isAlarm)
+        return segments.map { segment in
+            guard segment.k != "t", ToolPresentation.isAlarm(segment.s), !alarmNotes.isEmpty else { return segment }
+            return ChatSegment(k: segment.k, s: alarmNotes.removeFirst())
+        }
     }
 
     private func clock(_ milliseconds: Double) -> String {
@@ -640,6 +648,7 @@ private struct ToolPresentation {
     }
 
     static func shortName(_ raw: String) -> String {
+        if isAlarm(raw) { return "Alarm" }
         if raw.contains("ScheduleWakeup") { return "定闹钟" }
         if raw.contains("play_music") || raw.contains("music_card") { return "放歌" }
         if raw.contains("WebSearch") || raw.contains("WebFetch") { return "上网" }
@@ -652,6 +661,10 @@ private struct ToolPresentation {
         if raw.contains("Write(") || raw.contains("Edit(") { return "写入文件" }
         if raw.contains("Bash(") { return "执行命令" }
         return raw.split(separator: "(").first.map(String.init) ?? "动手做事"
+    }
+
+    static func isAlarm(_ raw: String) -> Bool {
+        raw.contains("chat-alarm.js") || raw.range(of: #"^(定|续|停了|看了眼)闹钟"#, options: .regularExpression) != nil
     }
 
     private static func json(in text: String, marker: String) -> [String: Any]? {

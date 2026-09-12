@@ -6,14 +6,30 @@ struct PearlApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .tint(.pearlAccent)
+                .tint(Color.pearlAccent)
         }
     }
 }
 
 private struct RootView: View {
     var body: some View {
-        ChatView()
+        AppShellView()
+    }
+}
+
+private struct AppShellView: View {
+    @State private var tab = 1
+
+    var body: some View {
+        TabView(selection: $tab) {
+            HomeView { tab = 1 }
+                .tabItem { Label("家", systemImage: "house") }
+                .tag(0)
+
+            ChatView()
+                .tabItem { Label("说话", systemImage: "bubble.left.and.bubble.right") }
+                .tag(1)
+        }
     }
 }
 
