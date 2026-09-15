@@ -104,6 +104,7 @@ final class Theme: ObservableObject {
         static let highlightLine: CGFloat = 1.5
         static let tiny: CGFloat = 2
         static let small: CGFloat = 4
+        static let metadataInset: CGFloat = 5
         static let compact: CGFloat = 6
         static let standard: CGFloat = 8
         static let roomy: CGFloat = 10
@@ -266,6 +267,7 @@ final class Theme: ObservableObject {
     var composerButtonFill: Color { cardSolid.opacity(0.72) }
     var composerShadow: Color { black.opacity(0.09) }
     var gaugeTrack: Color { metaText.opacity(0.20) }
+    var timestampText: Color { metaText.opacity(0.72) }
     var white: Color { Self.color(Defaults.white) }
     var black: Color { Self.color(Defaults.black) }
     var clear: Color { white.opacity(0) }
@@ -461,16 +463,4 @@ final class Theme: ObservableObject {
         case unreadable
         var errorDescription: String? { "这张图片没读到" }
     }
-}
-
-// Temporary compatibility for components that move onto live Theme tokens in later commits.
-extension Color {
-    static let pearlBackground = Theme.color(Theme.Defaults.backgroundLight)
-    static let pearlInk = Theme.color(Theme.Defaults.bubbleText)
-    static let pearlSoft = Theme.color(Theme.Defaults.metaText)
-    static let pearlLine = Theme.color(Theme.Defaults.white).opacity(0.62)
-    static let pearlAI = Theme.color(Theme.Defaults.cardSolid).opacity(Theme.Defaults.glassAlpha)
-    static let pearlMine = Theme.color(Theme.Defaults.mineSolid).opacity(Theme.Defaults.glassAlpha)
-    static let pearlField = Theme.color(Theme.Defaults.fieldSolid).opacity(Theme.Defaults.glassAlpha)
-    static let pearlAccent = Theme.color(Theme.Defaults.accent)
 }

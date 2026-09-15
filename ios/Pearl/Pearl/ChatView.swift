@@ -14,7 +14,7 @@ struct ChatView: View {
         NavigationStack {
             ScrollViewReader { proxy in
                 ScrollView {
-                    LazyVStack(spacing: 10) {
+                    LazyVStack(spacing: Theme.Metric.roomy) {
                         if model.hasMore {
                             HistoryPagingButton(title: "↑ 看更早的") { Task { await model.loadOlder() } }
                         }
@@ -22,7 +22,7 @@ struct ChatView: View {
                         ForEach(model.messages) { message in
                             MessageRow(message: message, model: model)
                                 .id(message.id)
-                                .padding(.vertical, 1)
+                                .padding(.vertical, Theme.Metric.thinLine)
                                 .modifier(SearchHighlight(active: model.highlightedID == message.id))
                         }
 
@@ -34,10 +34,10 @@ struct ChatView: View {
                             HistoryPagingButton(title: "↓ 回到现在") { Task { await model.goLatest() } }
                         }
 
-                        Color.clear.frame(height: 1).id("chat-bottom")
+                        theme.clear.frame(height: Theme.Metric.thinLine).id("chat-bottom")
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.top, 10)
+                    .padding(.horizontal, Theme.Metric.chatHorizontal)
+                    .padding(.top, Theme.Metric.roomy)
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .background(ChatBackground())
@@ -63,15 +63,15 @@ struct ChatView: View {
                     openAppearance: { showAppearance = true }
                 )
             }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                VStack(spacing: 4) {
+            .safeAreaInset(edge: .bottom, spacing: Theme.Metric.zero) {
+                VStack(spacing: Theme.Metric.small) {
                     if !model.error.isEmpty {
-                        Text(model.error).font(.caption).foregroundStyle(.red).lineLimit(2)
+                        Text(model.error).font(theme.font(.metadata)).foregroundStyle(theme.warning).lineLimit(2)
                     }
                     Composer(model: model) { showControls = true }
                 }
-                .padding(.horizontal, 10)
-                .padding(.bottom, 7)
+                .padding(.horizontal, Theme.Metric.composerHorizontal)
+                .padding(.bottom, Theme.Metric.composerBottom)
             }
             .sheet(isPresented: $showHistory) { HistoryFinder(model: model) }
             .sheet(isPresented: $showControls) { ChatControls(model: model) }
@@ -87,11 +87,12 @@ struct ChatView: View {
 }
 
 private struct MessageRow: View {
+    @EnvironmentObject private var theme: Theme
     let message: ChatMessage
     @ObservedObject var model: ChatViewModel
 
     var body: some View {
-        VStack(alignment: message.isMine ? .trailing : .leading, spacing: 6) {
+        VStack(alignment: message.isMine ? .trailing : .leading, spacing: Theme.Metric.compact) {
             if message.kind == "alarm" {
                 AlarmBlock(text: "闹钟响了", detail: message.alarmNote ?? "")
             }
@@ -102,14 +103,14 @@ private struct MessageRow: View {
 
             messageBody
 
-            HStack(spacing: 6) {
+            HStack(spacing: Theme.Metric.compact) {
                 if message.kind == "push" { Label("推送到了你手机", systemImage: "megaphone") }
                 Text(message.date, format: .dateTime.month(.twoDigits).day(.twoDigits).hour().minute())
                 if let cache = message.cache, !message.isMine { Text("⚡\(cache)%") }
             }
-            .font(.system(size: 9, design: .serif))
-            .foregroundStyle(Color.pearlSoft.opacity(0.65))
-            .padding(.horizontal, 5)
+            .font(theme.font(.metadata))
+            .foregroundStyle(theme.timestampText)
+            .padding(.horizontal, Theme.Metric.metadataInset)
         }
         .frame(maxWidth: .infinity, alignment: message.isMine ? .trailing : .leading)
         .contextMenu {
@@ -177,10 +178,11 @@ private struct MessageRow: View {
 }
 
 private struct LiveMessageRow: View {
+    @EnvironmentObject private var theme: Theme
     @ObservedObject var model: ChatViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: Theme.Metric.compact) {
             if !model.liveThinking.isEmpty {
                 ThinkBlock(text: model.liveThinking, startsOpen: true)
             }
@@ -311,194 +313,38 @@ private struct HTMLWebView: UIViewRepresentable {
 }
 
 private struct CallCard: View {
+    @EnvironmentObject private var theme: Theme
     let message: ChatMessage
     @State private var expanded = false
 
     var body: some View {
         DisclosureGroup(isExpanded: $expanded) {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Theme.Metric.standard) {
                 ForEach(Array((message.call?.turns ?? []).enumerated()), id: \.offset) { _, turn in
                     Text("**\(turn.role == "user" ? "你" : "他")**  \(turn.text)")
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                if message.call?.turns?.isEmpty != false { Text("（没有逐字记录）").foregroundStyle(.secondary) }
+                if message.call?.turns?.isEmpty != false {
+                    Text("（没有逐字记录）").foregroundStyle(theme.metaText)
+                }
             }
-            .font(.subheadline).padding(.top, 8)
+            .font(theme.font(.cardBody)).padding(.top, Theme.Metric.standard)
         } label: {
             Label([message.body, message.call?.reason].compactMap { $0 }.joined(separator: " · "),
                   systemImage: "phone.fill")
                 .fontWeight(.medium)
         }
-        .padding(13)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
-        .frame(maxWidth: 320)
-    }
-}
-
-private struct ToolBlock: View {
-    let text: String
-    var overrideLabel: String?
-    @State private var expanded = false
-    @State private var showCard = false
-
-    private var presentation: LegacyToolPresentation { LegacyToolPresentation.parse(text, label: overrideLabel) }
-
-    var body: some View {
-        Group {
-            if let audio = presentation.audio {
-                VStack(alignment: .leading, spacing: 7) {
-                    AudioBubble(url: audio, seconds: nil)
-                    if !presentation.detail.isEmpty {
-                        Text(presentation.detail).font(.caption).foregroundStyle(.secondary)
-                    }
-                }
-                .padding(11)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                .frame(maxWidth: 320, alignment: .leading)
-            } else if presentation.card {
-                Button { showCard = true } label: { cardFace }
-                    .buttonStyle(.plain)
-            } else if let url = presentation.url {
-                Link(destination: url) { cardFace }.buttonStyle(.plain)
-            } else {
-                DisclosureGroup(isExpanded: $expanded) {
-                    if !presentation.detail.isEmpty {
-                        Text(presentation.detail).font(.caption).foregroundStyle(.secondary)
-                            .textSelection(.enabled).padding(.top, 5)
-                    }
-                } label: {
-                    Label(presentation.label, systemImage: "hammer")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-                .padding(.horizontal, 10).padding(.vertical, 7)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 13))
-                .frame(maxWidth: 320, alignment: .leading)
-            }
-        }
-        .sheet(isPresented: $showCard) {
-            WrittenCard(label: presentation.label, content: presentation.detail)
-        }
-    }
-
-    private var cardFace: some View {
-        HStack(spacing: 10) {
-            Image(systemName: presentation.audio != nil ? "waveform" : presentation.url != nil ? "arrow.up.right.square" : "heart.text.square")
-                .frame(width: 28, height: 28).background(.thinMaterial, in: Circle())
-            VStack(alignment: .leading, spacing: 2) {
-                Text(presentation.label).font(.subheadline).fontWeight(.semibold)
-                Text(presentation.detail).font(.caption).foregroundStyle(.secondary).lineLimit(2)
-            }
-            Spacer()
-            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
-        }
-        .padding(11)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-        .frame(maxWidth: 320)
-    }
-}
-
-private struct LegacyToolPresentation {
-    let label: String
-    let detail: String
-    let card: Bool
-    let audio: URL?
-    let url: URL?
-
-    static func parse(_ raw: String, label forced: String? = nil) -> LegacyToolPresentation {
-        let text = raw.replacingOccurrences(of: "[记号] ", with: "")
-        if let j = json(in: text, marker: "voice_note"), let file = j["file"] as? String {
-            return LegacyToolPresentation(label: "语音", detail: j["text"] as? String ?? "点开播放",
-                                    card: false, audio: ChatAPI.mediaURL(file), url: ChatAPI.mediaURL(file))
-        }
-        if let j = json(in: text, marker: "tarot_draw") {
-            let id = j["id"] as? String ?? ""
-            let q = j["q"] as? String ?? "今天的牌"
-            return LegacyToolPresentation(label: "问牌 · \(q)", detail: "点开看牌面", card: false,
-                                    audio: nil, url: pageURL("/pages/tarot.html", id: id))
-        }
-        if let j = json(in: text, marker: "tarot_reading") {
-            return LegacyToolPresentation(label: "写下答案", detail: j["text"] as? String ?? "", card: true,
-                                    audio: nil, url: nil)
-        }
-        if let j = json(in: text, marker: "mail_draft") {
-            let id = j["id"] as? String ?? ""
-            let to = string(j["to"])
-            let subject = j["subject"] as? String ?? ""
-            let body = j["body"] as? String ?? ""
-            return LegacyToolPresentation(label: "回信草稿", detail: "给 \(to) · \(subject)\n\(body)", card: id.isEmpty,
-                                    audio: nil, url: id.isEmpty ? nil : pageURL("/pages/mail-review.html", id: id))
-        }
-        if let j = json(in: text, marker: "mcp__ob__murmur") {
-            return LegacyToolPresentation(label: "爸爸的碎碎念", detail: j["content"] as? String ?? "", card: true,
-                                    audio: nil, url: nil)
-        }
-        if let j = json(in: text, marker: "mcp__ob__hold") {
-            let tags = string(j["tags"])
-            let label = tags.contains("性爱日记") ? "爸爸的性爱日记" : tags.contains("日记") ? "爸爸的日记" : "爸爸记下的"
-            return LegacyToolPresentation(label: label, detail: j["content"] as? String ?? "", card: true,
-                                    audio: nil, url: nil)
-        }
-        if let j = json(in: text, marker: "note_write") {
-            return LegacyToolPresentation(label: "爸爸的便签", detail: j["text"] as? String ?? "", card: true,
-                                    audio: nil, url: nil)
-        }
-        if let j = json(in: text, marker: "card_write") {
-            let kind = j["type"] as? String ?? "卡片"
-            let title = j["title"] as? String ?? ""
-            let body = j["body"] as? String ?? ""
-            return LegacyToolPresentation(label: kind == "记忆" ? "爸爸记下的" : kind,
-                                    detail: [title, body].filter { !$0.isEmpty }.joined(separator: "\n\n"),
-                                    card: true, audio: nil, url: nil)
-        }
-        let label = forced ?? shortName(text)
-        return LegacyToolPresentation(label: label, detail: text == label ? "" : text, card: false, audio: nil, url: nil)
-    }
-
-    static func shortName(_ raw: String) -> String {
-        if isAlarm(raw) { return "Alarm" }
-        if raw.contains("ScheduleWakeup") { return "定闹钟" }
-        if raw.contains("play_music") || raw.contains("music_card") { return "放歌" }
-        if raw.contains("WebSearch") || raw.contains("WebFetch") { return "上网" }
-        if raw.contains("mcp__ob__") { return raw.contains("hold") || raw.contains("murmur") ? "写入记忆" : "读取记忆" }
-        if raw.contains("mcp__mail__") || raw.contains("mail_draft") { return "邮箱" }
-        if raw.contains("mcp__read__") { return "共读" }
-        if raw.contains("mcp__engawa") { return "檐廊" }
-        if raw.contains("mcp__atrio") { return "小客厅" }
-        if raw.contains("Read(") { return "读取文件" }
-        if raw.contains("Write(") || raw.contains("Edit(") { return "写入文件" }
-        if raw.contains("Bash(") { return "执行命令" }
-        return raw.split(separator: "(").first.map(String.init) ?? "动手做事"
-    }
-
-    static func isAlarm(_ raw: String) -> Bool {
-        raw.contains("chat-alarm.js") || raw.range(of: #"^(定|续|停了|看了眼)闹钟"#, options: .regularExpression) != nil
-    }
-
-    private static func json(in text: String, marker: String) -> [String: Any]? {
-        guard let markerRange = text.range(of: marker),
-              let open = text[markerRange.upperBound...].firstIndex(of: "{"),
-              let close = text.lastIndex(of: "}"), open <= close,
-              let data = String(text[open...close]).data(using: .utf8) else { return nil }
-        return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-    }
-
-    private static func string(_ value: Any?) -> String {
-        if let strings = value as? [String] { return strings.joined(separator: ", ") }
-        guard let value else { return "" }
-        return String(describing: value)
-    }
-
-    private static func pageURL(_ path: String, id: String) -> URL? {
-        guard !id.isEmpty else { return nil }
-        var parts = URLComponents(url: URL(string: path, relativeTo: ChatAPI.baseURL)!.absoluteURL,
-                                  resolvingAgainstBaseURL: false)!
-        parts.queryItems = [URLQueryItem(name: "id", value: id)]
-        return parts.url
+        .foregroundStyle(theme.bubbleText)
+        .padding(Theme.Metric.large)
+        .background(theme.cardSolid.opacity(theme.glassAlpha),
+                    in: RoundedRectangle(cornerRadius: Theme.Metric.cardRadius))
+        .frame(maxWidth: Theme.Metric.bubbleMaxWidth)
     }
 }
 
 private struct ChatControls: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var theme: Theme
     @ObservedObject var model: ChatViewModel
     @State private var selectedModel: String
     @State private var selectedEffort: String
@@ -529,7 +375,7 @@ private struct ChatControls: View {
                         ContextGauge(value: model.contextPercent)
                         VStack(alignment: .leading) {
                             Text("记忆水位 \(model.contextPercent)%")
-                            Text(model.modelLabel).font(.caption).foregroundStyle(.secondary)
+                            Text(model.modelLabel).font(theme.font(.metadata)).foregroundStyle(theme.metaText)
                         }
                     }
                 }
@@ -543,7 +389,11 @@ private struct ChatControls: View {
                     }
                     Toggle("显示原生思考", isOn: $thinking)
                 }
-                Section { Text("这些设置从下一条消息开始生效。").font(.caption).foregroundStyle(.secondary) }
+                Section {
+                    Text("这些设置从下一条消息开始生效。")
+                        .font(theme.font(.metadata))
+                        .foregroundStyle(theme.metaText)
+                }
             }
             .navigationTitle("聊天设置")
             .navigationBarTitleDisplayMode(.inline)
