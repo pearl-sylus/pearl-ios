@@ -154,7 +154,7 @@ private struct MessageRow: View {
             }
 
             if let thought = message.think, !thought.isEmpty {
-                ThoughtDisclosure(text: thought, cut: message.thinkCut)
+                ThinkBlock(text: thought, cut: message.thinkCut)
             }
 
             messageBody
@@ -240,7 +240,7 @@ private struct LiveMessageRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             if !model.liveThinking.isEmpty {
-                ThoughtDisclosure(text: model.liveThinking, startsOpen: true)
+                ThinkBlock(text: model.liveThinking, startsOpen: true)
             }
             if !model.liveTools.isEmpty {
                 ToolBlock(text: model.liveTools.uniqued().joined(separator: " · "), overrideLabel: "正在动手")
@@ -427,45 +427,6 @@ private struct MusicInfo {
         ]
         return MusicInfo(source: String(text[full]), name: group(2), artist: group(3),
                          cover: URL(string: group(4)), note: group(5), url: parts.url!)
-    }
-}
-
-private struct ThoughtDisclosure: View {
-    let text: String
-    let cut: String?
-    @State private var expanded: Bool
-
-    init(text: String, cut: String? = nil, startsOpen: Bool = false) {
-        self.text = text
-        self.cut = cut
-        _expanded = State(initialValue: startsOpen)
-    }
-
-    var body: some View {
-        DisclosureGroup(isExpanded: $expanded) {
-            VStack(alignment: .leading, spacing: 5) {
-                Text(text).font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
-                Text(cutLabel).font(.caption2)
-                    .foregroundStyle(cutWarning ? Color.orange : Color.secondary.opacity(0.7))
-            }
-            .padding(.top, 5)
-        } label: {
-            Text(cutWarning ? "✦ 他想过 ⚠" : "✦ 他想过")
-                .font(.system(size: 11.5, design: .serif)).foregroundStyle(Color.pearlSoft)
-        }
-        .padding(.horizontal, 9)
-        .frame(maxWidth: 280, alignment: .leading)
-    }
-
-    private var cutWarning: Bool { cut != nil && cut != "display" }
-    private var cutLabel: String {
-        switch cut {
-        case "display": return "\(text.count)字 · 显示掉尾，他其实想完了"
-        case "real": return "\(text.count)字 · 真没想完"
-        case "max_tokens": return "\(text.count)字 · 被输出上限掐断"
-        case .some(_): return "\(text.count)字 · 断尾了"
-        case nil: return "\(text.count)字 · 收完了"
-        }
     }
 }
 

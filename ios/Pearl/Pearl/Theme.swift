@@ -120,6 +120,7 @@ final class Theme: ObservableObject {
         static let imageRadius: CGFloat = 14
         static let thumbnailRadius: CGFloat = 10
         static let bubbleMaxWidth: CGFloat = 320
+        static let thinkMaxWidth: CGFloat = 520
         static let cardMaxWidth: CGFloat = 560
         static let imagePlaceholderHeight: CGFloat = 150
         static let imageErrorHeight: CGFloat = 90
@@ -279,6 +280,7 @@ final class Theme: ObservableObject {
     }
 
     var bubbleLineSpacing: CGFloat { CGFloat(bodySize * 0.60) }
+    var thinkingLineSpacing: CGFloat { 13.5 * 0.70 }
 
     func shine(for scheme: ColorScheme) -> LinearGradient {
         let strength = scheme == .dark ? 0.12 : 0.42
