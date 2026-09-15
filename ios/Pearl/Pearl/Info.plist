@@ -38,5 +38,9 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>LXGWWenKaiScreen.ttf</string>
+	</array>
 </dict>
 </plist>

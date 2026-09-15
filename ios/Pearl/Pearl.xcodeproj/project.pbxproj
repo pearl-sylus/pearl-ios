@@ -12,6 +12,8 @@
 		A20000000000000000000004 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000004 /* ChatViewModel.swift */; };
 		A20000000000000000000005 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000005 /* ChatView.swift */; };
 		A20000000000000000000007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000008 /* Assets.xcassets */; };
+		B20000000000000000000001 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* Theme.swift */; };
+		B20000000000000000000002 /* LXGWWenKaiScreen.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* LXGWWenKaiScreen.ttf */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +28,8 @@
 		A10000000000000000000008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000000000000000000009 /* HealthProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthProbe.swift; sourceTree = "<group>"; };
 		A1000000000000000000000A /* Pearl.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pearl.entitlements; sourceTree = "<group>"; };
+		B10000000000000000000001 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		B10000000000000000000002 /* LXGWWenKaiScreen.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/LXGWWenKaiScreen.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,9 +59,11 @@
 				A10000000000000000000004 /* ChatViewModel.swift */,
 				A10000000000000000000005 /* ChatView.swift */,
 				A10000000000000000000009 /* HealthProbe.swift */,
+				B10000000000000000000001 /* Theme.swift */,
 				A10000000000000000000007 /* Info.plist */,
 				A1000000000000000000000A /* Pearl.entitlements */,
 				A10000000000000000000008 /* Assets.xcassets */,
+				B10000000000000000000002 /* LXGWWenKaiScreen.ttf */,
 			);
 			path = Pearl;
 			sourceTree = "<group>";
@@ -123,6 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A20000000000000000000007 /* Assets.xcassets in Resources */,
+				B20000000000000000000002 /* LXGWWenKaiScreen.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,6 +145,7 @@
 				A20000000000000000000003 /* ChatAPI.swift in Sources */,
 				A20000000000000000000004 /* ChatViewModel.swift in Sources */,
 				A20000000000000000000005 /* ChatView.swift in Sources */,
+				B20000000000000000000001 /* Theme.swift in Sources */,
 				A20000000000000000000008 /* HealthProbe.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
