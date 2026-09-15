@@ -137,6 +137,7 @@ final class Theme: ObservableObject {
         static let attachmentSize: CGFloat = 58
         static let iconButtonSize: CGFloat = 34
         static let sendButtonSize: CGFloat = 42
+        static let composerButton: CGFloat = 38
         static let gaugeSize: CGFloat = 27
         static let gaugeLine: CGFloat = 3
         static let appearancePreviewHeight: CGFloat = 74
@@ -150,6 +151,7 @@ final class Theme: ObservableObject {
         static let shineEnd: CGFloat = 0.60
         static let customWallpaperMaxDimension: CGFloat = 1800
         static let customWallpaperQuality: CGFloat = 0.82
+        static let disabledOpacity = 0.45
     }
 
     enum Defaults {
@@ -259,6 +261,8 @@ final class Theme: ObservableObject {
     var warning: Color { Self.color(Defaults.warning) }
     var success: Color { Self.color(Defaults.success) }
     var tarotBack: Color { accent.opacity(0.34) }
+    var composerButtonFill: Color { cardSolid.opacity(0.72) }
+    var composerShadow: Color { black.opacity(0.09) }
     var white: Color { Self.color(Defaults.white) }
     var black: Color { Self.color(Defaults.black) }
     var clear: Color { white.opacity(0) }

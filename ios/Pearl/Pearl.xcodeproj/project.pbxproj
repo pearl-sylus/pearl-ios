@@ -25,6 +25,7 @@
 		B20000000000000000000011 /* TarotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000011 /* TarotCard.swift */; };
 		B20000000000000000000012 /* WriteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000012 /* WriteCard.swift */; };
 		B20000000000000000000013 /* AlbumRef.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000013 /* AlbumRef.swift */; };
+		B20000000000000000000014 /* Composer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000014 /* Composer.swift */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -52,6 +53,7 @@
 		B10000000000000000000011 /* TarotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TarotCard.swift; sourceTree = "<group>"; };
 		B10000000000000000000012 /* WriteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteCard.swift; sourceTree = "<group>"; };
 		B10000000000000000000013 /* AlbumRef.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumRef.swift; sourceTree = "<group>"; };
+		B10000000000000000000014 /* Composer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Composer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 		A30000000000000000000002 /* Products */ = {
 				B10000000000000000000013 /* AlbumRef.swift */,
 			isa = PBXGroup;
+				B10000000000000000000014 /* Composer.swift */,
 			children = (A10000000000000000000000 /* Pearl.app */);
 			name = Products;
 			sourceTree = "<group>";
@@ -200,6 +203,7 @@
 			isa = XCBuildConfiguration;
 				B20000000000000000000013 /* AlbumRef.swift in Sources */,
 			buildSettings = {
+				B20000000000000000000014 /* Composer.swift in Sources */,
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				COPY_PHASE_STRIP = NO;

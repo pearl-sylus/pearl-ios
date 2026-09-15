@@ -1,6 +1,4 @@
-import AVFoundation
 import Foundation
-import PhotosUI
 import SwiftUI
 import UIKit
 import WebKit
@@ -107,7 +105,7 @@ struct ChatView: View {
                     if !model.error.isEmpty {
                         Text(model.error).font(.caption).foregroundStyle(.red).lineLimit(2)
                     }
-                    ComposerView(model: model)
+                    Composer(model: model) { showControls = true }
                 }
                 .padding(.horizontal, 10)
                 .padding(.bottom, 7)
@@ -550,95 +548,6 @@ private struct LegacyToolPresentation {
                                   resolvingAgainstBaseURL: false)!
         parts.queryItems = [URLQueryItem(name: "id", value: id)]
         return parts.url
-    }
-}
-
-private struct ComposerView: View {
-    @ObservedObject var model: ChatViewModel
-    @State private var pickedPhotos: [PhotosPickerItem] = []
-    @FocusState private var focused: Bool
-
-    private var canSend: Bool {
-        model.isStreaming || !model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !model.pendingImages.isEmpty
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            if !model.pendingImages.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(model.pendingImages) { item in
-                            ZStack(alignment: .topTrailing) {
-                                Image(uiImage: item.image).resizable().scaledToFill()
-                                    .frame(width: 58, height: 58).clipShape(RoundedRectangle(cornerRadius: 10))
-                                Button { model.removeImage(item.id) } label: {
-                                    Image(systemName: "xmark.circle.fill").symbolRenderingMode(.palette)
-                                        .foregroundStyle(.white, .black.opacity(0.7))
-                                }
-                                .offset(x: 5, y: -5)
-                            }
-                        }
-                    }
-                    .padding(.top, 5)
-                }
-            }
-
-            HStack(alignment: .bottom, spacing: 6) {
-                HStack(alignment: .bottom, spacing: 5) {
-                    PhotosPicker(selection: $pickedPhotos, maxSelectionCount: 3, matching: .images) {
-                        Image(systemName: "paperclip").frame(width: 29, height: 34)
-                    }
-                    .disabled(model.pendingImages.count >= 3)
-
-                    Button { model.toggleRecording() } label: {
-                        Group {
-                            if model.isSendingVoice { ProgressView() }
-                            else { Image(systemName: model.isRecording ? "waveform.circle.fill" : "mic") }
-                        }
-                        .foregroundStyle(model.isRecording ? Color.red : Color.pearlAccent)
-                        .frame(width: 29, height: 34)
-                    }
-                    .accessibilityLabel(model.isRecording ? "结束并发送录音" : "录音")
-
-                    TextField(model.isRecording ? "正在录音…" : "把想说的放进来", text: $model.draft, axis: .vertical)
-                        .font(.system(size: 15, design: .serif))
-                        .foregroundStyle(Color.pearlInk)
-                        .lineLimit(1...6).focused($focused).padding(.vertical, 8)
-                        .disabled(model.isRecording)
-
-                    if model.isRecording {
-                        Button { model.cancelRecording() } label: {
-                            Image(systemName: "xmark").frame(width: 34, height: 34)
-                        }
-                        .accessibilityLabel("取消录音")
-                    }
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(Color.pearlField, in: Capsule())
-                .overlay { Capsule().stroke(Color.pearlLine, lineWidth: 0.7) }
-                .shadow(color: Color.black.opacity(0.09), radius: 18, y: 8)
-
-                if !model.isRecording {
-                    Button { Task { await model.sendOrStop() } } label: {
-                        Image(systemName: model.isStreaming && model.draft.isEmpty && model.pendingImages.isEmpty ? "stop.fill" : "arrow.up")
-                            .font(.system(size: 15, weight: .bold)).foregroundStyle(.white)
-                            .frame(width: 42, height: 42).background(Color.pearlAccent, in: Circle())
-                            .shadow(color: Color.black.opacity(0.15), radius: 12, y: 6)
-                    }
-                    .buttonStyle(.plain).disabled(!canSend).opacity(canSend ? 1 : 0.45)
-                }
-            }
-        }
-        .padding(.vertical, 7)
-        .onChange(of: pickedPhotos) { items in
-            Task {
-                for item in items.prefix(max(0, 3 - model.pendingImages.count)) {
-                    if let data = try? await item.loadTransferable(type: Data.self) { model.addImageData(data) }
-                }
-                pickedPhotos = []
-            }
-        }
     }
 }
 
