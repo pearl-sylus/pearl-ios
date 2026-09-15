@@ -92,32 +92,32 @@
 				B10000000000000000000001 /* Theme.swift */,
 				B10000000000000000000003 /* AppearanceSettings.swift */,
 				B10000000000000000000004 /* ChatBackground.swift */,
-				A10000000000000000000007 /* Info.plist */,
 				B10000000000000000000005 /* GlassBubble.swift */,
-				A1000000000000000000000A /* Pearl.entitlements */,
 				B10000000000000000000006 /* ThinkBlock.swift */,
-				A10000000000000000000008 /* Assets.xcassets */,
 				B10000000000000000000007 /* StepRow.swift */,
-				B10000000000000000000002 /* LXGWWenKaiScreen.ttf */,
 				B10000000000000000000008 /* AlarmBlock.swift */,
-			);
 				B10000000000000000000009 /* VoiceBar.swift */,
-			path = Pearl;
 				B10000000000000000000010 /* MusicCard.swift */,
-			sourceTree = "<group>";
 				B10000000000000000000011 /* TarotCard.swift */,
-		};
 				B10000000000000000000012 /* WriteCard.swift */,
-		A30000000000000000000002 /* Products */ = {
 				B10000000000000000000013 /* AlbumRef.swift */,
-			isa = PBXGroup;
 				B10000000000000000000014 /* Composer.swift */,
-			children = (A10000000000000000000000 /* Pearl.app */);
 				B10000000000000000000015 /* ChatTopBar.swift */,
-			name = Products;
 				B10000000000000000000016 /* HistoryFinder.swift */,
-			sourceTree = "<group>";
 				B10000000000000000000017 /* RootTabs.swift */,
+				A10000000000000000000007 /* Info.plist */,
+				A1000000000000000000000A /* Pearl.entitlements */,
+				A10000000000000000000008 /* Assets.xcassets */,
+				B10000000000000000000002 /* LXGWWenKaiScreen.ttf */,
+			);
+			path = Pearl;
+			sourceTree = "<group>";
+		};
+		A30000000000000000000002 /* Products */ = {
+			isa = PBXGroup;
+			children = (A10000000000000000000000 /* Pearl.app */);
+			name = Products;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -195,30 +195,30 @@
 				B20000000000000000000004 /* ChatBackground.swift in Sources */,
 				A20000000000000000000008 /* HealthProbe.swift in Sources */,
 				B20000000000000000000005 /* GlassBubble.swift in Sources */,
-			);
 				B20000000000000000000006 /* ThinkBlock.swift in Sources */,
-			runOnlyForDeploymentPostprocessing = 0;
 				B20000000000000000000007 /* StepRow.swift in Sources */,
-		};
 				B20000000000000000000008 /* AlarmBlock.swift in Sources */,
-/* End PBXSourcesBuildPhase section */
 				B20000000000000000000009 /* VoiceBar.swift in Sources */,
-
 				B20000000000000000000010 /* MusicCard.swift in Sources */,
-/* Begin XCBuildConfiguration section */
 				B20000000000000000000011 /* TarotCard.swift in Sources */,
-		A60000000000000000000000 /* Debug */ = {
 				B20000000000000000000012 /* WriteCard.swift in Sources */,
-			isa = XCBuildConfiguration;
 				B20000000000000000000013 /* AlbumRef.swift in Sources */,
-			buildSettings = {
 				B20000000000000000000014 /* Composer.swift in Sources */,
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				B20000000000000000000015 /* ChatTopBar.swift in Sources */,
-				CLANG_ENABLE_MODULES = YES;
 				B20000000000000000000016 /* HistoryFinder.swift in Sources */,
-				COPY_PHASE_STRIP = NO;
 				B20000000000000000000017 /* RootTabs.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A60000000000000000000000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
