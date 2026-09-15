@@ -4,6 +4,7 @@ import UIKit
 import WebKit
 
 struct ChatView: View {
+    @EnvironmentObject private var theme: Theme
     @StateObject private var model = ChatViewModel()
     @State private var showHistory = false
     @State private var showControls = false
@@ -65,41 +66,15 @@ struct ChatView: View {
                     scrollToBottom(proxy, animated: false)
                 }
             }
-            .navigationTitle("慢慢说")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button { showControls = true } label: {
-                        ContextGauge(value: model.contextPercent)
-                    }
-                    .accessibilityLabel("聊天设置，记忆水位 \(model.contextPercent)%")
-                }
-                ToolbarItem(placement: .principal) {
-                    VStack(spacing: 1) {
-                        Text("慢慢说")
-                            .font(.system(size: 18, weight: .medium, design: .serif))
-                            .foregroundStyle(Color.pearlInk)
-                        Text(model.status.isEmpty ? "你说，我听着。" : model.status)
-                            .font(.system(size: 10.5, design: .serif))
-                            .foregroundStyle(Color.pearlSoft)
-                            .lineLimit(1)
-                    }
-                }
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button { showHistory = true } label: {
-                        Image(systemName: "clock.arrow.circlepath")
-                    }
-                    Button { showAppearance = true } label: {
-                        Circle()
-                            .fill(Color.pearlField)
-                            .frame(width: 29, height: 29)
-                            .overlay(Image(systemName: "paintpalette").foregroundStyle(Color.pearlAccent))
-                    }
-                    .accessibilityLabel("外观设置")
-                }
+            .toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: Theme.Metric.zero) {
+                ChatTopBar(
+                    model: model,
+                    openHistory: { showHistory = true },
+                    openControls: { showControls = true },
+                    openAppearance: { showAppearance = true }
+                )
             }
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 4) {
                     if !model.error.isEmpty {
@@ -120,23 +95,6 @@ struct ChatView: View {
     private func scrollToBottom(_ proxy: ScrollViewProxy, animated: Bool = true) {
         let action = { proxy.scrollTo("chat-bottom", anchor: .bottom) }
         if animated { withAnimation(.easeOut(duration: 0.18), action) } else { action() }
-    }
-}
-
-private struct ContextGauge: View {
-    let value: Int
-
-    var body: some View {
-        ZStack {
-            Circle().stroke(.secondary.opacity(0.2), lineWidth: 3)
-            Circle()
-                .trim(from: 0, to: CGFloat(value) / 100)
-                .stroke(value > 82 ? Color.orange : Color.accentColor,
-                        style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-            Text("\(value)").font(.system(size: 8, weight: .bold, design: .rounded))
-        }
-        .frame(width: 27, height: 27)
     }
 }
 

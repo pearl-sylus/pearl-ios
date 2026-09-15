@@ -140,6 +140,8 @@ final class Theme: ObservableObject {
         static let composerButton: CGFloat = 38
         static let gaugeSize: CGFloat = 27
         static let gaugeLine: CGFloat = 3
+        static let topBarHeight: CGFloat = 52
+        static let topButton: CGFloat = 32
         static let appearancePreviewHeight: CGFloat = 74
         static let appearanceSwatch: CGFloat = 28
         static let appearanceSheetCorner: CGFloat = 24
@@ -263,6 +265,7 @@ final class Theme: ObservableObject {
     var tarotBack: Color { accent.opacity(0.34) }
     var composerButtonFill: Color { cardSolid.opacity(0.72) }
     var composerShadow: Color { black.opacity(0.09) }
+    var gaugeTrack: Color { metaText.opacity(0.20) }
     var white: Color { Self.color(Defaults.white) }
     var black: Color { Self.color(Defaults.black) }
     var clear: Color { white.opacity(0) }

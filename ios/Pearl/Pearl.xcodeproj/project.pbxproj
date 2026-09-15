@@ -26,6 +26,7 @@
 		B20000000000000000000012 /* WriteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000012 /* WriteCard.swift */; };
 		B20000000000000000000013 /* AlbumRef.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000013 /* AlbumRef.swift */; };
 		B20000000000000000000014 /* Composer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000014 /* Composer.swift */; };
+		B20000000000000000000015 /* ChatTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000015 /* ChatTopBar.swift */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +55,7 @@
 		B10000000000000000000012 /* WriteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteCard.swift; sourceTree = "<group>"; };
 		B10000000000000000000013 /* AlbumRef.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumRef.swift; sourceTree = "<group>"; };
 		B10000000000000000000014 /* Composer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Composer.swift; sourceTree = "<group>"; };
+		B10000000000000000000015 /* ChatTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTopBar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +109,7 @@
 			isa = PBXGroup;
 				B10000000000000000000014 /* Composer.swift */,
 			children = (A10000000000000000000000 /* Pearl.app */);
+				B10000000000000000000015 /* ChatTopBar.swift */,
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -205,6 +208,7 @@
 			buildSettings = {
 				B20000000000000000000014 /* Composer.swift in Sources */,
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				B20000000000000000000015 /* ChatTopBar.swift in Sources */,
 				CLANG_ENABLE_MODULES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
