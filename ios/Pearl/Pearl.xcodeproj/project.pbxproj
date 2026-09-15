@@ -16,6 +16,7 @@
 		B20000000000000000000002 /* LXGWWenKaiScreen.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* LXGWWenKaiScreen.ttf */; };
 		B20000000000000000000003 /* AppearanceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* AppearanceSettings.swift */; };
 		B20000000000000000000004 /* ChatBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000004 /* ChatBackground.swift */; };
+		B20000000000000000000005 /* GlassBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* GlassBubble.swift */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -34,6 +35,7 @@
 		B10000000000000000000002 /* LXGWWenKaiScreen.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/LXGWWenKaiScreen.ttf; sourceTree = "<group>"; };
 		B10000000000000000000003 /* AppearanceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettings.swift; sourceTree = "<group>"; };
 		B10000000000000000000004 /* ChatBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBackground.swift; sourceTree = "<group>"; };
+		B10000000000000000000005 /* GlassBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBubble.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 				B10000000000000000000003 /* AppearanceSettings.swift */,
 				B10000000000000000000004 /* ChatBackground.swift */,
 				A10000000000000000000007 /* Info.plist */,
+				B10000000000000000000005 /* GlassBubble.swift */,
 				A1000000000000000000000A /* Pearl.entitlements */,
 				A10000000000000000000008 /* Assets.xcassets */,
 				B10000000000000000000002 /* LXGWWenKaiScreen.ttf */,
@@ -155,6 +158,7 @@
 				B20000000000000000000003 /* AppearanceSettings.swift in Sources */,
 				B20000000000000000000004 /* ChatBackground.swift in Sources */,
 				A20000000000000000000008 /* HealthProbe.swift in Sources */,
+				B20000000000000000000005 /* GlassBubble.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

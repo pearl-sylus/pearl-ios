@@ -254,6 +254,7 @@ private struct LiveMessageRow: View {
 }
 
 private struct Bubble: View {
+    @EnvironmentObject private var theme: Theme
     let text: String
     let mine: Bool
     let images: [String]
@@ -262,50 +263,46 @@ private struct Bubble: View {
     var streaming = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let album {
-                Label("相册\(album.title.map { "《\($0)》" } ?? "")", systemImage: "photo.on.rectangle")
-                    .font(.caption)
-            }
-            if let voice, let file = voice.file, !file.isEmpty, let url = ChatAPI.mediaURL(file) {
-                AudioBubble(url: url, seconds: voice.secs)
-            }
-            ForEach(images, id: \.self) { name in
-                AsyncImage(url: ChatAPI.mediaURL(name)) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFit()
-                    } else if phase.error != nil {
-                        Label("图片没加载出来", systemImage: "photo.badge.exclamationmark")
-                            .frame(maxWidth: .infinity, minHeight: 90)
-                    } else {
-                        RoundedRectangle(cornerRadius: 14).fill(.quaternary).frame(height: 150)
-                    }
+        GlassBubble(mine: mine) {
+            VStack(alignment: .leading, spacing: Theme.Metric.standard) {
+                if let album {
+                    Label("相册\(album.title.map { "《\($0)》" } ?? "")", systemImage: "photo.on.rectangle")
+                        .font(theme.font(.metadata))
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                if let voice, let file = voice.file, !file.isEmpty, let url = ChatAPI.mediaURL(file) {
+                    AudioBubble(url: url, seconds: voice.secs)
+                }
+                ForEach(images, id: \.self) { name in
+                    AsyncImage(url: ChatAPI.mediaURL(name)) { phase in
+                        if let image = phase.image {
+                            image.resizable().scaledToFit()
+                        } else if phase.error != nil {
+                            Label("图片没加载出来", systemImage: "photo.badge.exclamationmark")
+                                .frame(maxWidth: .infinity, minHeight: Theme.Metric.imageErrorHeight)
+                        } else {
+                            RoundedRectangle(cornerRadius: Theme.Metric.imageRadius)
+                                .fill(theme.cardSolid)
+                                .frame(height: Theme.Metric.imagePlaceholderHeight)
+                        }
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Metric.imageRadius, style: .continuous))
+                }
+                if let voice {
+                    Label(["语音", voice.secs.map { "\($0)秒" }, voice.mood].compactMap { $0 }.joined(separator: " · "),
+                          systemImage: "mic")
+                        .font(theme.font(.metadata))
+                        .foregroundStyle(theme.metaText)
+                }
+                if !text.isEmpty { RichMessageText(text: text) }
+                if streaming {
+                    RoundedRectangle(cornerRadius: Theme.Metric.thinLine)
+                        .fill(theme.metaText)
+                        .frame(width: Theme.Metric.tiny, height: Theme.Metric.section)
+                }
             }
-            if let voice {
-                Label(["语音", voice.secs.map { "\($0)秒" }, voice.mood].compactMap { $0 }.joined(separator: " · "),
-                      systemImage: "mic")
-                    .font(.caption)
-                    .opacity(0.75)
-            }
-            if !text.isEmpty { RichMessageText(text: text) }
-            if streaming {
-                RoundedRectangle(cornerRadius: 1).fill(.secondary)
-                    .frame(width: 2, height: 17).opacity(0.7)
-            }
+            .font(theme.font(.bubble))
+            .foregroundStyle(theme.bubbleText)
         }
-        .foregroundStyle(Color.pearlInk)
-        .padding(.horizontal, 13)
-        .padding(.vertical, 8)
-        .background(mine ? Color.pearlMine : Color.pearlAI,
-                    in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 15, style: .continuous)
-                .stroke(Color.pearlLine.opacity(0.55), lineWidth: 0.5)
-        }
-        .shadow(color: Color.black.opacity(0.055), radius: 14, y: 7)
-        .frame(maxWidth: 280, alignment: mine ? .trailing : .leading)
     }
 }
 

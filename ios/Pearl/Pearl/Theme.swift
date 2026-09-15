@@ -270,6 +270,16 @@ final class Theme: ObservableObject {
         white.opacity(scheme == .dark ? 0.14 : 0.62)
     }
 
+    func primaryShadow(for scheme: ColorScheme) -> Color {
+        black.opacity(scheme == .dark ? 0.35 : 0.10)
+    }
+
+    func secondaryShadow(for scheme: ColorScheme) -> Color {
+        black.opacity(scheme == .dark ? 0.18 : 0.05)
+    }
+
+    var bubbleLineSpacing: CGFloat { CGFloat(bodySize * 0.60) }
+
     func shine(for scheme: ColorScheme) -> LinearGradient {
         let strength = scheme == .dark ? 0.12 : 0.42
         return LinearGradient(
