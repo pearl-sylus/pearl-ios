@@ -21,6 +21,7 @@
 		B20000000000000000000007 /* StepRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000007 /* StepRow.swift */; };
 		B20000000000000000000008 /* AlarmBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000008 /* AlarmBlock.swift */; };
 		B20000000000000000000009 /* VoiceBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000009 /* VoiceBar.swift */; };
+		B20000000000000000000010 /* MusicCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000010 /* MusicCard.swift */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +45,7 @@
 		B10000000000000000000007 /* StepRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepRow.swift; sourceTree = "<group>"; };
 		B10000000000000000000008 /* AlarmBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmBlock.swift; sourceTree = "<group>"; };
 		B10000000000000000000009 /* VoiceBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceBar.swift; sourceTree = "<group>"; };
+		B10000000000000000000010 /* MusicCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicCard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +89,7 @@
 			);
 				B10000000000000000000009 /* VoiceBar.swift */,
 			path = Pearl;
+				B10000000000000000000010 /* MusicCard.swift */,
 			sourceTree = "<group>";
 		};
 		A30000000000000000000002 /* Products */ = {
@@ -180,6 +183,7 @@
 /* End PBXSourcesBuildPhase section */
 				B20000000000000000000009 /* VoiceBar.swift in Sources */,
 
+				B20000000000000000000010 /* MusicCard.swift in Sources */,
 /* Begin XCBuildConfiguration section */
 		A60000000000000000000000 /* Debug */ = {
 			isa = XCBuildConfiguration;

@@ -128,6 +128,7 @@ final class Theme: ObservableObject {
         static let voiceMinWidth: CGFloat = 126
         static let waveWidth: CGFloat = 3
         static let voiceBars: [CGFloat] = [8, 14, 20, 12, 17]
+        static let musicCover: CGFloat = 48
         static let imagePlaceholderHeight: CGFloat = 150
         static let imageErrorHeight: CGFloat = 90
         static let attachmentSize: CGFloat = 58
@@ -314,6 +315,8 @@ final class Theme: ObservableObject {
     func thinkingFill() -> Color {
         cardSolid.opacity(glassEnabled ? max(glassAlpha * 0.70, 0.50) : 1)
     }
+
+    func embeddedCardFill() -> Color { white.opacity(0.28) }
 
     func voiceFill(mine: Bool) -> Color {
         (mine ? cardSolid : accent).opacity(mine ? 0.76 : 0.88)

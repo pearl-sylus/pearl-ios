@@ -305,6 +305,7 @@ private struct Bubble: View {
 }
 
 private struct RichMessageText: View {
+    @EnvironmentObject private var theme: Theme
     let text: String
     @State private var showHTML = false
 
@@ -317,40 +318,25 @@ private struct RichMessageText: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Theme.Metric.standard) {
             if !plain.isEmpty {
                 Text((try? AttributedString(markdown: plain,
                                             options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                      ?? AttributedString(plain))
-                    .font(.system(size: 14, design: .serif))
-                    .lineSpacing(3)
+                    .font(theme.font(.bubble))
+                    .lineSpacing(theme.bubbleLineSpacing)
                     .textSelection(.enabled)
             }
             if let music {
-                Link(destination: music.url) {
-                    HStack(spacing: 10) {
-                        AsyncImage(url: music.cover) { image in image.resizable().scaledToFill() } placeholder: { Color.white.opacity(0.15) }
-                            .frame(width: 48, height: 48).clipShape(RoundedRectangle(cornerRadius: 9))
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(music.name).fontWeight(.semibold).lineLimit(1)
-                            Text(music.artist).font(.caption).opacity(0.75).lineLimit(1)
-                            if !music.note.isEmpty { Text(music.note).font(.caption2).lineLimit(1) }
-                        }
-                        Spacer()
-                        Image(systemName: "play.fill")
-                    }
-                    .padding(8)
-                    .background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 13))
-                }
-                .buttonStyle(.plain)
+                MusicCard(music: music)
             }
             if artifact != nil {
                 Button { showHTML = true } label: {
                     Label("他做了一张网页卡片", systemImage: "sparkles.rectangle.stack")
-                        .font(.subheadline).fontWeight(.medium)
-                        .padding(10)
+                        .font(theme.font(.cardBody)).fontWeight(.medium)
+                        .padding(Theme.Metric.roomy)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 13))
+                        .background(theme.embeddedCardFill(), in: RoundedRectangle(cornerRadius: Theme.Metric.toolRadius))
                 }
                 .buttonStyle(.plain)
             }
@@ -396,36 +382,6 @@ private struct HTMLWebView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {}
-}
-
-private struct MusicInfo {
-    let source: String
-    let name: String
-    let artist: String
-    let cover: URL?
-    let note: String
-    let url: URL
-
-    static func parse(_ text: String) -> MusicInfo? {
-        let pattern = #"\[music:(\d+):([^\[\]:]+?):([^\[\]:]*?):(https?:[^\]|]*)\|?([^\]]*)\]"#
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
-              let full = Range(match.range(at: 0), in: text) else { return nil }
-        func group(_ index: Int) -> String {
-            guard let range = Range(match.range(at: index), in: text) else { return "" }
-            return String(text[range]).trimmingCharacters(in: .whitespaces)
-        }
-        var parts = URLComponents(url: URL(string: "/pages/music.html", relativeTo: ChatAPI.baseURL)!.absoluteURL,
-                                  resolvingAgainstBaseURL: false)!
-        parts.queryItems = [
-            URLQueryItem(name: "id", value: group(1)),
-            URLQueryItem(name: "name", value: group(2)),
-            URLQueryItem(name: "artist", value: group(3)),
-            URLQueryItem(name: "pic", value: group(4))
-        ]
-        return MusicInfo(source: String(text[full]), name: group(2), artist: group(3),
-                         cover: URL(string: group(4)), note: group(5), url: parts.url!)
-    }
 }
 
 private struct CallCard: View {
