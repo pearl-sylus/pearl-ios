@@ -6,15 +6,9 @@ struct PearlApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView()
+            RootTabs()
                 .environmentObject(theme)
                 .tint(theme.accent)
         }
-    }
-}
-
-private struct RootView: View {
-    var body: some View {
-        ChatView()
     }
 }

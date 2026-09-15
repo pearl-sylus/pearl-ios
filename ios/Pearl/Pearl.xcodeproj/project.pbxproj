@@ -28,6 +28,7 @@
 		B20000000000000000000014 /* Composer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000014 /* Composer.swift */; };
 		B20000000000000000000015 /* ChatTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000015 /* ChatTopBar.swift */; };
 		B20000000000000000000016 /* HistoryFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000016 /* HistoryFinder.swift */; };
+		B20000000000000000000017 /* RootTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000017 /* RootTabs.swift */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +59,7 @@
 		B10000000000000000000014 /* Composer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Composer.swift; sourceTree = "<group>"; };
 		B10000000000000000000015 /* ChatTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTopBar.swift; sourceTree = "<group>"; };
 		B10000000000000000000016 /* HistoryFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryFinder.swift; sourceTree = "<group>"; };
+		B10000000000000000000017 /* RootTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabs.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +117,7 @@
 			name = Products;
 				B10000000000000000000016 /* HistoryFinder.swift */,
 			sourceTree = "<group>";
+				B10000000000000000000017 /* RootTabs.swift */,
 		};
 /* End PBXGroup section */
 
@@ -215,6 +218,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				B20000000000000000000016 /* HistoryFinder.swift in Sources */,
 				COPY_PHASE_STRIP = NO;
+				B20000000000000000000017 /* RootTabs.swift in Sources */,
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
