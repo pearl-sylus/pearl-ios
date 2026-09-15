@@ -185,9 +185,9 @@ private struct MessageRow: View {
 
     @ViewBuilder private var messageBody: some View {
         if message.kind == "alarm-auto" {
-            ToolBlock(text: message.body, overrideLabel: "定闹钟 · 守夜")
+            StepRow(text: message.body, overrideLabel: "定闹钟 · 守夜")
         } else if message.kind == "alarm-skip" {
-            ToolBlock(text: alarmSkipDetail, overrideLabel: "闹钟到点 · \(message.why ?? "正聊着")，跳过了")
+            StepRow(text: alarmSkipDetail, overrideLabel: "闹钟到点 · \(message.why ?? "正聊着")，跳过了")
         } else if message.kind == "call" {
             CallCard(message: message)
         } else if let segments = message.seg, !message.isMine, !segments.isEmpty {
@@ -198,7 +198,7 @@ private struct MessageRow: View {
                 if segment.k == "t" {
                     Bubble(text: segment.s, mine: false, images: [])
                 } else {
-                    ToolBlock(text: segment.s)
+                    StepRow(text: segment.s)
                 }
             }
         } else {
@@ -208,8 +208,7 @@ private struct MessageRow: View {
                    voice: message.voice,
                    album: message.album)
             if !message.isMine, let tools = message.tools, !tools.isEmpty {
-                ToolBlock(text: (message.toolNotes?.joined(separator: "\n") ?? tools.joined(separator: " · ")),
-                          overrideLabel: (message.toolNotes ?? tools).map(ToolPresentation.shortName).uniqued().joined(separator: " · "))
+                StepRows(items: message.toolNotes ?? tools)
             }
         }
     }
@@ -243,7 +242,7 @@ private struct LiveMessageRow: View {
                 ThinkBlock(text: model.liveThinking, startsOpen: true)
             }
             if !model.liveTools.isEmpty {
-                ToolBlock(text: model.liveTools.uniqued().joined(separator: " · "), overrideLabel: "正在动手")
+                StepRows(items: model.liveTools.uniqued())
             }
             if !model.liveText.isEmpty {
                 Bubble(text: model.liveText, mine: false, images: [], streaming: true)
@@ -461,7 +460,7 @@ private struct ToolBlock: View {
     @State private var expanded = false
     @State private var showCard = false
 
-    private var presentation: ToolPresentation { ToolPresentation.parse(text, label: overrideLabel) }
+    private var presentation: LegacyToolPresentation { LegacyToolPresentation.parse(text, label: overrideLabel) }
 
     var body: some View {
         Group {
@@ -517,27 +516,27 @@ private struct ToolBlock: View {
     }
 }
 
-private struct ToolPresentation {
+private struct LegacyToolPresentation {
     let label: String
     let detail: String
     let card: Bool
     let audio: URL?
     let url: URL?
 
-    static func parse(_ raw: String, label forced: String? = nil) -> ToolPresentation {
+    static func parse(_ raw: String, label forced: String? = nil) -> LegacyToolPresentation {
         let text = raw.replacingOccurrences(of: "[记号] ", with: "")
         if let j = json(in: text, marker: "voice_note"), let file = j["file"] as? String {
-            return ToolPresentation(label: "语音", detail: j["text"] as? String ?? "点开播放",
+            return LegacyToolPresentation(label: "语音", detail: j["text"] as? String ?? "点开播放",
                                     card: false, audio: ChatAPI.mediaURL(file), url: ChatAPI.mediaURL(file))
         }
         if let j = json(in: text, marker: "tarot_draw") {
             let id = j["id"] as? String ?? ""
             let q = j["q"] as? String ?? "今天的牌"
-            return ToolPresentation(label: "问牌 · \(q)", detail: "点开看牌面", card: false,
+            return LegacyToolPresentation(label: "问牌 · \(q)", detail: "点开看牌面", card: false,
                                     audio: nil, url: pageURL("/pages/tarot.html", id: id))
         }
         if let j = json(in: text, marker: "tarot_reading") {
-            return ToolPresentation(label: "写下答案", detail: j["text"] as? String ?? "", card: true,
+            return LegacyToolPresentation(label: "写下答案", detail: j["text"] as? String ?? "", card: true,
                                     audio: nil, url: nil)
         }
         if let j = json(in: text, marker: "mail_draft") {
@@ -545,33 +544,33 @@ private struct ToolPresentation {
             let to = string(j["to"])
             let subject = j["subject"] as? String ?? ""
             let body = j["body"] as? String ?? ""
-            return ToolPresentation(label: "回信草稿", detail: "给 \(to) · \(subject)\n\(body)", card: id.isEmpty,
+            return LegacyToolPresentation(label: "回信草稿", detail: "给 \(to) · \(subject)\n\(body)", card: id.isEmpty,
                                     audio: nil, url: id.isEmpty ? nil : pageURL("/pages/mail-review.html", id: id))
         }
         if let j = json(in: text, marker: "mcp__ob__murmur") {
-            return ToolPresentation(label: "爸爸的碎碎念", detail: j["content"] as? String ?? "", card: true,
+            return LegacyToolPresentation(label: "爸爸的碎碎念", detail: j["content"] as? String ?? "", card: true,
                                     audio: nil, url: nil)
         }
         if let j = json(in: text, marker: "mcp__ob__hold") {
             let tags = string(j["tags"])
             let label = tags.contains("性爱日记") ? "爸爸的性爱日记" : tags.contains("日记") ? "爸爸的日记" : "爸爸记下的"
-            return ToolPresentation(label: label, detail: j["content"] as? String ?? "", card: true,
+            return LegacyToolPresentation(label: label, detail: j["content"] as? String ?? "", card: true,
                                     audio: nil, url: nil)
         }
         if let j = json(in: text, marker: "note_write") {
-            return ToolPresentation(label: "爸爸的便签", detail: j["text"] as? String ?? "", card: true,
+            return LegacyToolPresentation(label: "爸爸的便签", detail: j["text"] as? String ?? "", card: true,
                                     audio: nil, url: nil)
         }
         if let j = json(in: text, marker: "card_write") {
             let kind = j["type"] as? String ?? "卡片"
             let title = j["title"] as? String ?? ""
             let body = j["body"] as? String ?? ""
-            return ToolPresentation(label: kind == "记忆" ? "爸爸记下的" : kind,
+            return LegacyToolPresentation(label: kind == "记忆" ? "爸爸记下的" : kind,
                                     detail: [title, body].filter { !$0.isEmpty }.joined(separator: "\n\n"),
                                     card: true, audio: nil, url: nil)
         }
         let label = forced ?? shortName(text)
-        return ToolPresentation(label: label, detail: text == label ? "" : text, card: false, audio: nil, url: nil)
+        return LegacyToolPresentation(label: label, detail: text == label ? "" : text, card: false, audio: nil, url: nil)
     }
 
     static func shortName(_ raw: String) -> String {
@@ -617,7 +616,7 @@ private struct ToolPresentation {
     }
 }
 
-private struct WrittenCard: View {
+struct WrittenCard: View {
     @Environment(\.dismiss) private var dismiss
     let label: String
     let content: String
@@ -639,7 +638,7 @@ private struct WrittenCard: View {
     }
 }
 
-private struct AudioBubble: View {
+struct AudioBubble: View {
     @StateObject private var player: RemoteAudioPlayer
     let seconds: Int?
 

@@ -18,6 +18,7 @@
 		B20000000000000000000004 /* ChatBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000004 /* ChatBackground.swift */; };
 		B20000000000000000000005 /* GlassBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* GlassBubble.swift */; };
 		B20000000000000000000006 /* ThinkBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* ThinkBlock.swift */; };
+		B20000000000000000000007 /* StepRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000007 /* StepRow.swift */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +39,7 @@
 		B10000000000000000000004 /* ChatBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBackground.swift; sourceTree = "<group>"; };
 		B10000000000000000000005 /* GlassBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBubble.swift; sourceTree = "<group>"; };
 		B10000000000000000000006 /* ThinkBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThinkBlock.swift; sourceTree = "<group>"; };
+		B10000000000000000000007 /* StepRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepRow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,7 @@
 				A1000000000000000000000A /* Pearl.entitlements */,
 				B10000000000000000000006 /* ThinkBlock.swift */,
 				A10000000000000000000008 /* Assets.xcassets */,
+				B10000000000000000000007 /* StepRow.swift */,
 				B10000000000000000000002 /* LXGWWenKaiScreen.ttf */,
 			);
 			path = Pearl;
@@ -165,6 +168,7 @@
 			);
 				B20000000000000000000006 /* ThinkBlock.swift in Sources */,
 			runOnlyForDeploymentPostprocessing = 0;
+				B20000000000000000000007 /* StepRow.swift in Sources */,
 		};
 /* End PBXSourcesBuildPhase section */
 

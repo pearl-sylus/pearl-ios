@@ -122,6 +122,8 @@ final class Theme: ObservableObject {
         static let bubbleMaxWidth: CGFloat = 320
         static let thinkMaxWidth: CGFloat = 520
         static let cardMaxWidth: CGFloat = 560
+        static let stepMaxWidth: CGFloat = 520
+        static let cardIcon: CGFloat = 28
         static let imagePlaceholderHeight: CGFloat = 150
         static let imageErrorHeight: CGFloat = 90
         static let attachmentSize: CGFloat = 58
