@@ -263,27 +263,9 @@ private struct Bubble: View {
     var body: some View {
         GlassBubble(mine: mine) {
             VStack(alignment: .leading, spacing: Theme.Metric.standard) {
-                if let album {
-                    Label("相册\(album.title.map { "《\($0)》" } ?? "")", systemImage: "photo.on.rectangle")
-                        .font(theme.font(.metadata))
-                }
+                if album != nil || !images.isEmpty { AlbumRef(images: images, album: album) }
                 if let voice, let file = voice.file, !file.isEmpty, let url = ChatAPI.mediaURL(file) {
                     VoiceBar(url: url, seconds: voice.secs, mine: mine)
-                }
-                ForEach(images, id: \.self) { name in
-                    AsyncImage(url: ChatAPI.mediaURL(name)) { phase in
-                        if let image = phase.image {
-                            image.resizable().scaledToFit()
-                        } else if phase.error != nil {
-                            Label("图片没加载出来", systemImage: "photo.badge.exclamationmark")
-                                .frame(maxWidth: .infinity, minHeight: Theme.Metric.imageErrorHeight)
-                        } else {
-                            RoundedRectangle(cornerRadius: Theme.Metric.imageRadius)
-                                .fill(theme.cardSolid)
-                                .frame(height: Theme.Metric.imagePlaceholderHeight)
-                        }
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: Theme.Metric.imageRadius, style: .continuous))
                 }
                 if let voice {
                     Label(["语音", voice.secs.map { "\($0)秒" }, voice.mood].compactMap { $0 }.joined(separator: " · "),

@@ -24,6 +24,7 @@
 		B20000000000000000000010 /* MusicCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000010 /* MusicCard.swift */; };
 		B20000000000000000000011 /* TarotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000011 /* TarotCard.swift */; };
 		B20000000000000000000012 /* WriteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000012 /* WriteCard.swift */; };
+		B20000000000000000000013 /* AlbumRef.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000013 /* AlbumRef.swift */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -50,6 +51,7 @@
 		B10000000000000000000010 /* MusicCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicCard.swift; sourceTree = "<group>"; };
 		B10000000000000000000011 /* TarotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TarotCard.swift; sourceTree = "<group>"; };
 		B10000000000000000000012 /* WriteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteCard.swift; sourceTree = "<group>"; };
+		B10000000000000000000013 /* AlbumRef.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumRef.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 		};
 				B10000000000000000000012 /* WriteCard.swift */,
 		A30000000000000000000002 /* Products */ = {
+				B10000000000000000000013 /* AlbumRef.swift */,
 			isa = PBXGroup;
 			children = (A10000000000000000000000 /* Pearl.app */);
 			name = Products;
@@ -195,6 +198,7 @@
 		A60000000000000000000000 /* Debug */ = {
 				B20000000000000000000012 /* WriteCard.swift in Sources */,
 			isa = XCBuildConfiguration;
+				B20000000000000000000013 /* AlbumRef.swift in Sources */,
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
