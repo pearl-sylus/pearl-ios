@@ -9,6 +9,7 @@ struct ChatView: View {
     @StateObject private var model = ChatViewModel()
     @State private var showHistory = false
     @State private var showControls = false
+    @State private var showAppearance = false
 
     var body: some View {
         NavigationStack {
@@ -90,13 +91,13 @@ struct ChatView: View {
                     Button { showHistory = true } label: {
                         Image(systemName: "clock.arrow.circlepath")
                     }
-                    Button { showControls = true } label: {
+                    Button { showAppearance = true } label: {
                         Circle()
-                            .fill(AngularGradient(colors: [.blue.opacity(0.55), .pink.opacity(0.45), .orange.opacity(0.45), .mint.opacity(0.5), .blue.opacity(0.55)], center: .center))
+                            .fill(Color.pearlField)
                             .frame(width: 29, height: 29)
-                            .overlay(Image(systemName: "slider.horizontal.3").font(.system(size: 11, weight: .medium)).foregroundStyle(.white))
+                            .overlay(Image(systemName: "paintpalette").foregroundStyle(Color.pearlAccent))
                     }
-                    .accessibilityLabel("聊天设置")
+                    .accessibilityLabel("外观设置")
                 }
             }
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
@@ -113,6 +114,7 @@ struct ChatView: View {
             }
             .sheet(isPresented: $showHistory) { HistoryFinder(model: model) }
             .sheet(isPresented: $showControls) { ChatControls(model: model) }
+            .sheet(isPresented: $showAppearance) { AppearanceSettings() }
         }
         .onDisappear { model.stop() }
     }
