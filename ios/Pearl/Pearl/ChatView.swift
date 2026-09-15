@@ -142,39 +142,6 @@ private struct ContextGauge: View {
     }
 }
 
-private struct ChatBackground: View {
-    @Environment(\.colorScheme) private var scheme
-
-    var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                Color.pearlBackground
-                AsyncImage(url: wallpaperURL) { image in
-                    image.resizable().scaledToFill()
-                } placeholder: {
-                    Color.clear
-                }
-                .frame(width: proxy.size.width, height: proxy.size.height)
-                .clipped()
-                .opacity(scheme == .dark ? 0.28 : 0.50)
-                LinearGradient(
-                    colors: scheme == .dark
-                        ? [Color.black.opacity(0.54), Color.black.opacity(0.68)]
-                        : [Color.white.opacity(0.18), Color.white.opacity(0.05), Color.pearlBackground.opacity(0.20)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            }
-        }
-        .ignoresSafeArea()
-    }
-
-    private var wallpaperURL: URL? {
-        URL(string: scheme == .dark ? "/assets/tidal-echo/chat-harbor.webp" : "/assets/tidal-echo/chat-light.webp",
-            relativeTo: ChatAPI.baseURL)?.absoluteURL
-    }
-}
-
 private struct MessageRow: View {
     let message: ChatMessage
     @ObservedObject var model: ChatViewModel
