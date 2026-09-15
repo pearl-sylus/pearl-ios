@@ -16,23 +16,14 @@ struct ChatView: View {
                 ScrollView {
                     LazyVStack(spacing: 10) {
                         if model.hasMore {
-                            Button("↑ 看更早的") { Task { await model.loadOlder() } }
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                                .padding(.vertical, 8)
+                            HistoryPagingButton(title: "↑ 看更早的") { Task { await model.loadOlder() } }
                         }
 
                         ForEach(model.messages) { message in
                             MessageRow(message: message, model: model)
                                 .id(message.id)
                                 .padding(.vertical, 1)
-                                .overlay {
-                                    if model.highlightedID == message.id {
-                                        RoundedRectangle(cornerRadius: 22)
-                                            .stroke(Color.accentColor.opacity(0.7), lineWidth: 1.5)
-                                            .padding(-4)
-                                    }
-                                }
+                                .modifier(SearchHighlight(active: model.highlightedID == message.id))
                         }
 
                         if model.isStreaming || !model.liveText.isEmpty || !model.liveThinking.isEmpty {
@@ -40,10 +31,7 @@ struct ChatView: View {
                         }
 
                         if model.hasNewer {
-                            Button("↓ 回到现在") { Task { await model.goLatest() } }
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                                .padding(.vertical, 8)
+                            HistoryPagingButton(title: "↓ 回到现在") { Task { await model.goLatest() } }
                         }
 
                         Color.clear.frame(height: 1).id("chat-bottom")
@@ -506,76 +494,6 @@ private struct LegacyToolPresentation {
                                   resolvingAgainstBaseURL: false)!
         parts.queryItems = [URLQueryItem(name: "id", value: id)]
         return parts.url
-    }
-}
-
-private struct HistoryFinder: View {
-    @Environment(\.dismiss) private var dismiss
-    @ObservedObject var model: ChatViewModel
-    @State private var query = ""
-    @State private var date = Date()
-    @State private var hits: [SearchHit] = []
-    @State private var busy = false
-    @State private var error = ""
-    private let api = ChatAPI()
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section("按日期") {
-                    DatePicker("哪一天", selection: $date, in: ...Date(), displayedComponents: .date)
-                    Button("跳到这一天") { Task { await jumpToDay() } }.disabled(busy)
-                }
-                if !hits.isEmpty {
-                    Section("聊天记录") {
-                        ForEach(hits) { hit in
-                            Button {
-                                Task { await model.jump(to: hit.id); dismiss() }
-                            } label: {
-                                VStack(alignment: .leading, spacing: 5) {
-                                    Text(hit.role == "user" ? "你" : "他").font(.caption).foregroundStyle(.secondary)
-                                    (Text(hit.before).foregroundColor(.secondary) + Text(hit.match).bold() + Text(hit.after).foregroundColor(.secondary))
-                                        .font(.subheadline).lineLimit(3)
-                                    Text(hit.date, format: .dateTime.year().month().day().hour().minute())
-                                        .font(.caption2).foregroundStyle(.tertiary)
-                                }
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-                if !error.isEmpty { Text(error).foregroundStyle(.red) }
-            }
-            .overlay { if busy { ProgressView() } }
-            .navigationTitle("翻旧话")
-            .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $query, prompt: "搜聊天原文")
-            .onSubmit(of: .search) { Task { await search() } }
-            .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("关上") { dismiss() } } }
-        }
-    }
-
-    private func search() async {
-        let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !q.isEmpty else { return }
-        busy = true
-        defer { busy = false }
-        do { hits = try await api.search(q).hits; error = "" }
-        catch { self.error = error.localizedDescription }
-    }
-
-    private func jumpToDay() async {
-        busy = true
-        defer { busy = false }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(identifier: "Asia/Shanghai")
-        formatter.dateFormat = "yyyy-MM-dd"
-        do {
-            let id = try await api.firstMessage(on: formatter.string(from: date))
-            await model.jump(to: id, startOfDay: true)
-            dismiss()
-        } catch { self.error = error.localizedDescription }
     }
 }
 
