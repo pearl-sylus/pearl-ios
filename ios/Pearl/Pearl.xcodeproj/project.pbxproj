@@ -19,6 +19,7 @@
 		B20000000000000000000005 /* GlassBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* GlassBubble.swift */; };
 		B20000000000000000000006 /* ThinkBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* ThinkBlock.swift */; };
 		B20000000000000000000007 /* StepRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000007 /* StepRow.swift */; };
+		B20000000000000000000008 /* AlarmBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000008 /* AlarmBlock.swift */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -40,6 +41,7 @@
 		B10000000000000000000005 /* GlassBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBubble.swift; sourceTree = "<group>"; };
 		B10000000000000000000006 /* ThinkBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThinkBlock.swift; sourceTree = "<group>"; };
 		B10000000000000000000007 /* StepRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepRow.swift; sourceTree = "<group>"; };
+		B10000000000000000000008 /* AlarmBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmBlock.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 				A10000000000000000000008 /* Assets.xcassets */,
 				B10000000000000000000007 /* StepRow.swift */,
 				B10000000000000000000002 /* LXGWWenKaiScreen.ttf */,
+				B10000000000000000000008 /* AlarmBlock.swift */,
 			);
 			path = Pearl;
 			sourceTree = "<group>";
@@ -170,6 +173,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 				B20000000000000000000007 /* StepRow.swift in Sources */,
 		};
+				B20000000000000000000008 /* AlarmBlock.swift in Sources */,
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */

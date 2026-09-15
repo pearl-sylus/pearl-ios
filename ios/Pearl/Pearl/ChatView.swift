@@ -149,8 +149,7 @@ private struct MessageRow: View {
     var body: some View {
         VStack(alignment: message.isMine ? .trailing : .leading, spacing: 6) {
             if message.kind == "alarm" {
-                Label(message.alarmNote.map { "闹钟响了 · \($0)" } ?? "闹钟响了", systemImage: "clock")
-                    .font(.caption).foregroundStyle(.secondary)
+                AlarmBlock(text: "闹钟响了", detail: message.alarmNote ?? "")
             }
 
             if let thought = message.think, !thought.isEmpty {
@@ -185,9 +184,9 @@ private struct MessageRow: View {
 
     @ViewBuilder private var messageBody: some View {
         if message.kind == "alarm-auto" {
-            StepRow(text: message.body, overrideLabel: "定闹钟 · 守夜")
+            AlarmBlock(text: "定闹钟 · 守夜", detail: message.body)
         } else if message.kind == "alarm-skip" {
-            StepRow(text: alarmSkipDetail, overrideLabel: "闹钟到点 · \(message.why ?? "正聊着")，跳过了")
+            AlarmBlock(text: "闹钟到点 · \(message.why ?? "正聊着")，跳过了", detail: alarmSkipDetail)
         } else if message.kind == "call" {
             CallCard(message: message)
         } else if let segments = message.seg, !message.isMine, !segments.isEmpty {
