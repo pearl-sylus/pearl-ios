@@ -20,6 +20,7 @@
 		B20000000000000000000006 /* ThinkBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* ThinkBlock.swift */; };
 		B20000000000000000000007 /* StepRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000007 /* StepRow.swift */; };
 		B20000000000000000000008 /* AlarmBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000008 /* AlarmBlock.swift */; };
+		B20000000000000000000009 /* VoiceBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000009 /* VoiceBar.swift */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +43,7 @@
 		B10000000000000000000006 /* ThinkBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThinkBlock.swift; sourceTree = "<group>"; };
 		B10000000000000000000007 /* StepRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepRow.swift; sourceTree = "<group>"; };
 		B10000000000000000000008 /* AlarmBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmBlock.swift; sourceTree = "<group>"; };
+		B10000000000000000000009 /* VoiceBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceBar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +85,7 @@
 				B10000000000000000000002 /* LXGWWenKaiScreen.ttf */,
 				B10000000000000000000008 /* AlarmBlock.swift */,
 			);
+				B10000000000000000000009 /* VoiceBar.swift */,
 			path = Pearl;
 			sourceTree = "<group>";
 		};
@@ -175,6 +178,7 @@
 		};
 				B20000000000000000000008 /* AlarmBlock.swift in Sources */,
 /* End PBXSourcesBuildPhase section */
+				B20000000000000000000009 /* VoiceBar.swift in Sources */,
 
 /* Begin XCBuildConfiguration section */
 		A60000000000000000000000 /* Debug */ = {

@@ -268,7 +268,7 @@ private struct Bubble: View {
                         .font(theme.font(.metadata))
                 }
                 if let voice, let file = voice.file, !file.isEmpty, let url = ChatAPI.mediaURL(file) {
-                    AudioBubble(url: url, seconds: voice.secs)
+                    VoiceBar(url: url, seconds: voice.secs, mine: mine)
                 }
                 ForEach(images, id: \.self) { name in
                     AsyncImage(url: ChatAPI.mediaURL(name)) { phase in
@@ -634,50 +634,6 @@ struct WrittenCard: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("关上") { dismiss() } } }
         }
-    }
-}
-
-struct AudioBubble: View {
-    @StateObject private var player: RemoteAudioPlayer
-    let seconds: Int?
-
-    init(url: URL, seconds: Int?) {
-        _player = StateObject(wrappedValue: RemoteAudioPlayer(url: url))
-        self.seconds = seconds
-    }
-
-    var body: some View {
-        Button { player.toggle() } label: {
-            HStack(spacing: 9) {
-                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                Image(systemName: "waveform").font(.title3)
-                if let seconds, seconds > 0 { Text("\(seconds)″").font(.caption.monospacedDigit()) }
-            }
-            .frame(minWidth: 105, alignment: .leading)
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-@MainActor
-private final class RemoteAudioPlayer: ObservableObject {
-    @Published var isPlaying = false
-    private let player: AVPlayer
-    private var token: NSObjectProtocol?
-
-    init(url: URL) {
-        player = AVPlayer(url: url)
-        token = NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
-                                                       object: player.currentItem, queue: .main) { [weak self] _ in
-            Task { @MainActor in self?.isPlaying = false }
-        }
-    }
-
-    deinit { if let token { NotificationCenter.default.removeObserver(token) } }
-
-    func toggle() {
-        if isPlaying { player.pause() } else { player.play() }
-        isPlaying.toggle()
     }
 }
 

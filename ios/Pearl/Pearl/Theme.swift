@@ -124,6 +124,10 @@ final class Theme: ObservableObject {
         static let cardMaxWidth: CGFloat = 560
         static let stepMaxWidth: CGFloat = 520
         static let cardIcon: CGFloat = 28
+        static let voiceControl: CGFloat = 24
+        static let voiceMinWidth: CGFloat = 126
+        static let waveWidth: CGFloat = 3
+        static let voiceBars: [CGFloat] = [8, 14, 20, 12, 17]
         static let imagePlaceholderHeight: CGFloat = 150
         static let imageErrorHeight: CGFloat = 90
         static let attachmentSize: CGFloat = 58
@@ -310,6 +314,16 @@ final class Theme: ObservableObject {
     func thinkingFill() -> Color {
         cardSolid.opacity(glassEnabled ? max(glassAlpha * 0.70, 0.50) : 1)
     }
+
+    func voiceFill(mine: Bool) -> Color {
+        (mine ? cardSolid : accent).opacity(mine ? 0.76 : 0.88)
+    }
+
+    func voiceControlFill(mine: Bool) -> Color {
+        (mine ? accent : white).opacity(0.18)
+    }
+
+    func voiceForeground(mine: Bool) -> Color { mine ? accent : white }
 
     func font(_ role: FontRole) -> Font {
         let spec: (CGFloat, Font.Weight) = {

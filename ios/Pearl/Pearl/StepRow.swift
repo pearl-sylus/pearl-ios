@@ -36,7 +36,7 @@ struct StepRow: View {
         Group {
             if items.count == 1, let audio = presentation.audio {
                 VStack(alignment: .leading, spacing: Theme.Metric.compact) {
-                    AudioBubble(url: audio, seconds: nil)
+                    VoiceBar(url: audio, seconds: nil, mine: false)
                     if !presentation.detail.isEmpty {
                         Text(presentation.detail)
                             .font(theme.font(.toolDetail))
