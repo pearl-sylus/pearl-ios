@@ -15,7 +15,7 @@ struct TarotCard: View {
         }
         .buttonStyle(.plain)
         .sheet(isPresented: $showReading) {
-            WrittenCard(label: presentation.label, content: presentation.detail)
+            WriteCardDetail(label: presentation.label, content: presentation.detail)
         }
     }
 

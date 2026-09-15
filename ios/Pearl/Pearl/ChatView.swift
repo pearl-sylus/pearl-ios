@@ -571,28 +571,6 @@ private struct LegacyToolPresentation {
     }
 }
 
-struct WrittenCard: View {
-    @Environment(\.dismiss) private var dismiss
-    let label: String
-    let content: String
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    Label(label, systemImage: "heart").font(.caption).foregroundStyle(.secondary)
-                    Text(content).font(.system(.body, design: .serif)).lineSpacing(8).textSelection(.enabled)
-                }
-                .padding(24).frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .background(ChatBackground())
-            .navigationTitle(label)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("关上") { dismiss() } } }
-        }
-    }
-}
-
 private struct ComposerView: View {
     @ObservedObject var model: ChatViewModel
     @State private var pickedPhotos: [PhotosPickerItem] = []

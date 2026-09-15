@@ -131,6 +131,7 @@ final class Theme: ObservableObject {
         static let musicCover: CGFloat = 48
         static let tarotWidth: CGFloat = 42
         static let tarotHeight: CGFloat = 58
+        static let detailPadding: CGFloat = 24
         static let imagePlaceholderHeight: CGFloat = 150
         static let imageErrorHeight: CGFloat = 90
         static let attachmentSize: CGFloat = 58

@@ -36,6 +36,8 @@ struct StepRow: View {
         Group {
             if items.count == 1, presentation.kind == .tarot {
                 TarotCard(presentation: presentation)
+            } else if items.count == 1, presentation.kind == .write {
+                WriteCard(presentation: presentation)
             } else if items.count == 1, let audio = presentation.audio {
                 VStack(alignment: .leading, spacing: Theme.Metric.compact) {
                     VoiceBar(url: audio, seconds: nil, mine: false)
@@ -57,7 +59,7 @@ struct StepRow: View {
         }
         .frame(maxWidth: Theme.Metric.stepMaxWidth, alignment: .leading)
         .sheet(isPresented: $showCard) {
-            WrittenCard(label: presentation.label, content: presentation.detail)
+            WriteCardDetail(label: presentation.label, content: presentation.detail)
         }
     }
 
@@ -171,21 +173,21 @@ struct ToolPresentation {
             let subject = j["subject"] as? String ?? ""
             let body = j["body"] as? String ?? ""
             return ToolPresentation(label: "回信草稿", detail: "给 \(to) · \(subject)\n\(body)", card: id.isEmpty,
-                                    audio: nil, url: id.isEmpty ? nil : pageURL("/pages/mail-review.html", id: id))
+                                    audio: nil, url: id.isEmpty ? nil : pageURL("/pages/mail-review.html", id: id), kind: .write)
         }
         if let j = json(in: text, marker: "mcp__ob__murmur") {
             return ToolPresentation(label: "爸爸的碎碎念", detail: j["content"] as? String ?? "", card: true,
-                                    audio: nil, url: nil)
+                                    audio: nil, url: nil, kind: .write)
         }
         if let j = json(in: text, marker: "mcp__ob__hold") {
             let tags = string(j["tags"])
             let label = tags.contains("性爱日记") ? "爸爸的性爱日记" : tags.contains("日记") ? "爸爸的日记" : "爸爸记下的"
             return ToolPresentation(label: label, detail: j["content"] as? String ?? "", card: true,
-                                    audio: nil, url: nil)
+                                    audio: nil, url: nil, kind: .write)
         }
         if let j = json(in: text, marker: "note_write") {
             return ToolPresentation(label: "爸爸的便签", detail: j["text"] as? String ?? "", card: true,
-                                    audio: nil, url: nil)
+                                    audio: nil, url: nil, kind: .write)
         }
         if let j = json(in: text, marker: "card_write") {
             let kind = j["type"] as? String ?? "卡片"
@@ -193,7 +195,7 @@ struct ToolPresentation {
             let body = j["body"] as? String ?? ""
             return ToolPresentation(label: kind == "记忆" ? "爸爸记下的" : kind,
                                     detail: [title, body].filter { !$0.isEmpty }.joined(separator: "\n\n"),
-                                    card: true, audio: nil, url: nil)
+                                    card: true, audio: nil, url: nil, kind: .write)
         }
         let label = forced ?? shortName(text)
         return ToolPresentation(label: label, detail: text == label ? "" : text, card: false, audio: nil, url: nil)
