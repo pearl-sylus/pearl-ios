@@ -129,6 +129,8 @@ final class Theme: ObservableObject {
         static let waveWidth: CGFloat = 3
         static let voiceBars: [CGFloat] = [8, 14, 20, 12, 17]
         static let musicCover: CGFloat = 48
+        static let tarotWidth: CGFloat = 42
+        static let tarotHeight: CGFloat = 58
         static let imagePlaceholderHeight: CGFloat = 150
         static let imageErrorHeight: CGFloat = 90
         static let attachmentSize: CGFloat = 58
@@ -255,6 +257,7 @@ final class Theme: ObservableObject {
     var thinkText: Color { Self.color(thinkTextHex) }
     var warning: Color { Self.color(Defaults.warning) }
     var success: Color { Self.color(Defaults.success) }
+    var tarotBack: Color { accent.opacity(0.34) }
     var white: Color { Self.color(Defaults.white) }
     var black: Color { Self.color(Defaults.black) }
     var clear: Color { white.opacity(0) }

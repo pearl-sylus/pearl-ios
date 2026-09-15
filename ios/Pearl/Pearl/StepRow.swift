@@ -34,7 +34,9 @@ struct StepRow: View {
 
     var body: some View {
         Group {
-            if items.count == 1, let audio = presentation.audio {
+            if items.count == 1, presentation.kind == .tarot {
+                TarotCard(presentation: presentation)
+            } else if items.count == 1, let audio = presentation.audio {
                 VStack(alignment: .leading, spacing: Theme.Metric.compact) {
                     VoiceBar(url: audio, seconds: nil, mine: false)
                     if !presentation.detail.isEmpty {
@@ -116,11 +118,23 @@ struct ToolGroup: Identifiable {
 }
 
 struct ToolPresentation {
+    enum Kind: Equatable { case generic, voice, tarot, write }
+
     let label: String
     let detail: String
     let card: Bool
     let audio: URL?
     let url: URL?
+    let kind: Kind
+
+    init(label: String, detail: String, card: Bool, audio: URL?, url: URL?, kind: Kind = .generic) {
+        self.label = label
+        self.detail = detail
+        self.card = card
+        self.audio = audio
+        self.url = url
+        self.kind = kind
+    }
 
     static func groups(_ items: [String]) -> [ToolGroup] {
         var result: [ToolGroup] = []
@@ -139,17 +153,17 @@ struct ToolPresentation {
         let text = raw.replacingOccurrences(of: "[记号] ", with: "")
         if let j = json(in: text, marker: "voice_note"), let file = j["file"] as? String {
             return ToolPresentation(label: "语音", detail: j["text"] as? String ?? "点开播放",
-                                    card: false, audio: ChatAPI.mediaURL(file), url: ChatAPI.mediaURL(file))
+                                    card: false, audio: ChatAPI.mediaURL(file), url: ChatAPI.mediaURL(file), kind: .voice)
         }
         if let j = json(in: text, marker: "tarot_draw") {
             let id = j["id"] as? String ?? ""
             let q = j["q"] as? String ?? "今天的牌"
             return ToolPresentation(label: "问牌 · \(q)", detail: "点开看牌面", card: false,
-                                    audio: nil, url: pageURL("/pages/tarot.html", id: id))
+                                    audio: nil, url: pageURL("/pages/tarot.html", id: id), kind: .tarot)
         }
         if let j = json(in: text, marker: "tarot_reading") {
             return ToolPresentation(label: "写下答案", detail: j["text"] as? String ?? "", card: true,
-                                    audio: nil, url: nil)
+                                    audio: nil, url: nil, kind: .tarot)
         }
         if let j = json(in: text, marker: "mail_draft") {
             let id = j["id"] as? String ?? ""

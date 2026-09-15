@@ -22,6 +22,7 @@
 		B20000000000000000000008 /* AlarmBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000008 /* AlarmBlock.swift */; };
 		B20000000000000000000009 /* VoiceBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000009 /* VoiceBar.swift */; };
 		B20000000000000000000010 /* MusicCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000010 /* MusicCard.swift */; };
+		B20000000000000000000011 /* TarotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000011 /* TarotCard.swift */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -46,6 +47,7 @@
 		B10000000000000000000008 /* AlarmBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmBlock.swift; sourceTree = "<group>"; };
 		B10000000000000000000009 /* VoiceBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceBar.swift; sourceTree = "<group>"; };
 		B10000000000000000000010 /* MusicCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicCard.swift; sourceTree = "<group>"; };
+		B10000000000000000000011 /* TarotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TarotCard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +93,7 @@
 			path = Pearl;
 				B10000000000000000000010 /* MusicCard.swift */,
 			sourceTree = "<group>";
+				B10000000000000000000011 /* TarotCard.swift */,
 		};
 		A30000000000000000000002 /* Products */ = {
 			isa = PBXGroup;
@@ -185,6 +188,7 @@
 
 				B20000000000000000000010 /* MusicCard.swift in Sources */,
 /* Begin XCBuildConfiguration section */
+				B20000000000000000000011 /* TarotCard.swift in Sources */,
 		A60000000000000000000000 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
