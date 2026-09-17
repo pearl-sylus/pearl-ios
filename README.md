@@ -4,8 +4,6 @@
 
 - 最低系统：iOS 16。
 - 当前只做聊天页：先把消息、思考、工具步骤和输入体验做完整、做漂亮，其他页面暂不进入安装包。
-- GitHub Actions 的 `Build unsigned iOS app` 生成未签名 IPA，之后在 Windows 用免费 Apple 账户签名安装。
+- GitHub Actions 的 `Build unsigned iOS app` 生成未签名 IPA；在 Mac 上也可以直接用 Xcode 选择自己的 Team 后装到真机。
 
-> 免费七天签名先只验纯聊天。苹果能力表里的“Apple Developer”不等于 Xcode 的
-> “Personal Team”；已有近期真机记录显示 HealthKit entitlement 可能被 Personal Team
-> 拒绝。等聊天包签进真机后，再用独立 HealthKit 探针实测，不能让它卡住主 App。
+> 免费七天签名包不带 HealthKit entitlement，避免 Personal Team 在安装阶段拒绝。

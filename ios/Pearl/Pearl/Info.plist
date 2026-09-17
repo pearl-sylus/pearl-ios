@@ -22,8 +22,6 @@
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>用来把你的语音送进聊天。</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>读取你允许的步数、心率、睡眠、HRV、体温和经期数据，帮助 Purr Den 了解你的健康状态。</string>
 	<key>NSCameraUsageDescription</key>
 	<string>用来拍照片发进聊天和相册。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
