@@ -29,6 +29,7 @@
 		B20000000000000000000015 /* ChatTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000015 /* ChatTopBar.swift */; };
 		B20000000000000000000016 /* HistoryFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000016 /* HistoryFinder.swift */; };
 		B20000000000000000000017 /* RootTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000017 /* RootTabs.swift */; };
+		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,8 @@
 		A10000000000000000000005 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		A10000000000000000000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A10000000000000000000008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A10000000000000000000009 /* HealthProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthProbe.swift; sourceTree = "<group>"; };
+		A1000000000000000000000A /* Pearl.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pearl.entitlements; sourceTree = "<group>"; };
 		B10000000000000000000001 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		B10000000000000000000002 /* LXGWWenKaiScreen.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/LXGWWenKaiScreen.ttf; sourceTree = "<group>"; };
 		B10000000000000000000003 /* AppearanceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettings.swift; sourceTree = "<group>"; };
@@ -85,6 +88,7 @@
 				A10000000000000000000003 /* ChatAPI.swift */,
 				A10000000000000000000004 /* ChatViewModel.swift */,
 				A10000000000000000000005 /* ChatView.swift */,
+				A10000000000000000000009 /* HealthProbe.swift */,
 				B10000000000000000000001 /* Theme.swift */,
 				B10000000000000000000003 /* AppearanceSettings.swift */,
 				B10000000000000000000004 /* ChatBackground.swift */,
@@ -102,6 +106,7 @@
 				B10000000000000000000016 /* HistoryFinder.swift */,
 				B10000000000000000000017 /* RootTabs.swift */,
 				A10000000000000000000007 /* Info.plist */,
+				A1000000000000000000000A /* Pearl.entitlements */,
 				A10000000000000000000008 /* Assets.xcassets */,
 				B10000000000000000000002 /* LXGWWenKaiScreen.ttf */,
 			);
@@ -144,6 +149,9 @@
 				TargetAttributes = {
 					A40000000000000000000001 = {
 						CreatedOnToolsVersion = 26.0;
+						SystemCapabilities = {
+							com.apple.HealthKit = { enabled = 1; };
+						};
 					};
 				};
 			};
@@ -185,6 +193,7 @@
 				B20000000000000000000001 /* Theme.swift in Sources */,
 				B20000000000000000000003 /* AppearanceSettings.swift in Sources */,
 				B20000000000000000000004 /* ChatBackground.swift in Sources */,
+				A20000000000000000000008 /* HealthProbe.swift in Sources */,
 				B20000000000000000000005 /* GlassBubble.swift in Sources */,
 				B20000000000000000000006 /* ThinkBlock.swift in Sources */,
 				B20000000000000000000007 /* StepRow.swift in Sources */,
@@ -238,6 +247,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Pearl/Pearl.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -258,6 +268,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Pearl/Pearl.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
