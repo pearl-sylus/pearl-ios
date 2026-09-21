@@ -29,6 +29,11 @@
 		B20000000000000000000015 /* ChatTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000015 /* ChatTopBar.swift */; };
 		B20000000000000000000016 /* HistoryFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000016 /* HistoryFinder.swift */; };
 		B20000000000000000000017 /* RootTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000017 /* RootTabs.swift */; };
+		B20000000000000000000018 /* NotoSerifSC.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000018 /* NotoSerifSC.ttf */; };
+		B20000000000000000000019 /* ChillRoundF.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000019 /* ChillRoundF.ttf */; };
+		B20000000000000000000020 /* Xiaolai-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000020 /* Xiaolai-Regular.ttf */; };
+		B20000000000000000000021 /* Yozai-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000021 /* Yozai-Regular.ttf */; };
+		B20000000000000000000022 /* ZhuqueFangsong-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000022 /* ZhuqueFangsong-Regular.ttf */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +65,11 @@
 		B10000000000000000000015 /* ChatTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTopBar.swift; sourceTree = "<group>"; };
 		B10000000000000000000016 /* HistoryFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryFinder.swift; sourceTree = "<group>"; };
 		B10000000000000000000017 /* RootTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabs.swift; sourceTree = "<group>"; };
+		B10000000000000000000018 /* NotoSerifSC.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/NotoSerifSC.ttf; sourceTree = "<group>"; };
+		B10000000000000000000019 /* ChillRoundF.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/ChillRoundF.ttf; sourceTree = "<group>"; };
+		B10000000000000000000020 /* Xiaolai-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/Xiaolai-Regular.ttf; sourceTree = "<group>"; };
+		B10000000000000000000021 /* Yozai-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/Yozai-Regular.ttf; sourceTree = "<group>"; };
+		B10000000000000000000022 /* ZhuqueFangsong-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/ZhuqueFangsong-Regular.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +119,11 @@
 				A1000000000000000000000A /* Pearl.entitlements */,
 				A10000000000000000000008 /* Assets.xcassets */,
 				B10000000000000000000002 /* LXGWWenKaiScreen.ttf */,
+				B10000000000000000000018 /* NotoSerifSC.ttf */,
+				B10000000000000000000019 /* ChillRoundF.ttf */,
+				B10000000000000000000020 /* Xiaolai-Regular.ttf */,
+				B10000000000000000000021 /* Yozai-Regular.ttf */,
+				B10000000000000000000022 /* ZhuqueFangsong-Regular.ttf */,
 			);
 			path = Pearl;
 			sourceTree = "<group>";
@@ -175,6 +190,11 @@
 			files = (
 				A20000000000000000000007 /* Assets.xcassets in Resources */,
 				B20000000000000000000002 /* LXGWWenKaiScreen.ttf in Resources */,
+				B20000000000000000000018 /* NotoSerifSC.ttf in Resources */,
+				B20000000000000000000019 /* ChillRoundF.ttf in Resources */,
+				B20000000000000000000020 /* Xiaolai-Regular.ttf in Resources */,
+				B20000000000000000000021 /* Yozai-Regular.ttf in Resources */,
+				B20000000000000000000022 /* ZhuqueFangsong-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

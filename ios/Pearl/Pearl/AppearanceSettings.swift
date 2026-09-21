@@ -87,7 +87,7 @@ struct AppearanceSettings: View {
                     Text(choice.label).tag(choice)
                 }
             }
-            Text("霞鹜文楷已随 App 打包；其余非系统字体会在后续补入。")
+            Text("所列非系统字体均已随 App 打包。")
                 .font(theme.font(.metadata))
                 .foregroundStyle(theme.metaText)
         }

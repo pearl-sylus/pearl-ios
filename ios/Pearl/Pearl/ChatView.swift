@@ -9,6 +9,7 @@ struct ChatView: View {
     @State private var showHistory = false
     @State private var showControls = false
     @State private var showAppearance = false
+    @State private var isAtBottom = true
 
     var body: some View {
         NavigationStack {
@@ -34,13 +35,38 @@ struct ChatView: View {
                             HistoryPagingButton(title: "↓ 回到现在") { Task { await model.goLatest() } }
                         }
 
-                        theme.clear.frame(height: Theme.Metric.thinLine).id("chat-bottom")
+                        theme.clear
+                            .frame(height: Theme.Metric.thinLine)
+                            .id("chat-bottom")
+                            .onAppear { isAtBottom = true }
+                            .onDisappear { isAtBottom = false }
                     }
                     .padding(.horizontal, Theme.Metric.chatHorizontal)
                     .padding(.top, Theme.Metric.roomy)
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .background(ChatBackground())
+                .overlay(alignment: .bottomTrailing) {
+                    if !isAtBottom {
+                        Button {
+                            if model.hasNewer {
+                                Task { await model.goLatest() }
+                            } else {
+                                scrollToBottom(proxy)
+                            }
+                        } label: {
+                            Image(systemName: "arrow.down")
+                                .font(theme.font(.control).weight(.semibold))
+                                .frame(width: Theme.Metric.sendButtonSize, height: Theme.Metric.sendButtonSize)
+                                .background(theme.panelFill(), in: Circle())
+                                .overlay { Circle().stroke(theme.rim(for: .light), lineWidth: Theme.Metric.thinLine) }
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(theme.accent)
+                        .padding(Theme.Metric.large)
+                        .accessibilityLabel("回到底部")
+                    }
+                }
                 .onChange(of: model.bottomRequest) { _ in scrollToBottom(proxy) }
                 .onChange(of: model.liveText) { _ in scrollToBottom(proxy) }
                 .onChange(of: model.liveThinking) { _ in scrollToBottom(proxy) }
@@ -106,7 +132,20 @@ private struct MessageRow: View {
             HStack(spacing: Theme.Metric.compact) {
                 if message.kind == "push" { Label("推送到了你手机", systemImage: "megaphone") }
                 Text(message.date, format: .dateTime.month(.twoDigits).day(.twoDigits).hour().minute())
+                Button { UIPasteboard.general.string = message.body } label: {
+                    Image(systemName: "doc.on.doc")
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("复制")
+                if message.isMine {
+                    Button { model.resend(message) } label: {
+                        Image(systemName: "arrow.counterclockwise")
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("重发")
+                }
                 if let cache = message.cache, !message.isMine { Text("⚡\(cache)%") }
+                if let hr = message.hr, !message.isMine { Text("♥\(hr)") }
             }
             .font(theme.font(.metadata))
             .foregroundStyle(theme.timestampText)
@@ -140,7 +179,7 @@ private struct MessageRow: View {
             }
             ForEach(Array(displaySegments(segments).enumerated()), id: \.offset) { _, segment in
                 if segment.k == "t" {
-                    Bubble(text: segment.s, mine: false, images: [])
+                    Bubble(text: segment.s, mine: false, images: [], presentation: model.presentation(for: segment.s))
                 } else {
                     StepRow(text: segment.s)
                 }
@@ -150,7 +189,8 @@ private struct MessageRow: View {
                    mine: message.isMine,
                    images: message.img ?? [],
                    voice: message.voice,
-                   album: message.album)
+                   album: message.album,
+                   presentation: model.presentation(for: message.body))
             if !message.isMine, let tools = message.tools, !tools.isEmpty {
                 StepRows(items: message.toolNotes ?? tools)
             }
@@ -184,7 +224,7 @@ private struct LiveMessageRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Metric.compact) {
             if !model.liveThinking.isEmpty {
-                ThinkBlock(text: model.liveThinking, startsOpen: true)
+                ThinkBlock(text: model.liveThinking)
             }
             if !model.liveTools.isEmpty {
                 StepRows(items: model.liveTools.uniqued())
@@ -205,6 +245,7 @@ private struct Bubble: View {
     var voice: VoiceMeta?
     var album: AlbumMeta?
     var streaming = false
+    var presentation: RichTextPresentation?
 
     var body: some View {
         GlassBubble(mine: mine) {
@@ -219,7 +260,13 @@ private struct Bubble: View {
                         .font(theme.font(.metadata))
                         .foregroundStyle(theme.metaText)
                 }
-                if !text.isEmpty { RichMessageText(text: text) }
+                if let presentation {
+                    RichMessageText(presentation: presentation)
+                } else if !text.isEmpty {
+                    Text(text)
+                        .lineSpacing(theme.bubbleLineSpacing)
+                        .textSelection(.enabled)
+                }
                 if streaming {
                     RoundedRectangle(cornerRadius: Theme.Metric.thinLine)
                         .fill(theme.metaText)
@@ -234,31 +281,21 @@ private struct Bubble: View {
 
 private struct RichMessageText: View {
     @EnvironmentObject private var theme: Theme
-    let text: String
+    let presentation: RichTextPresentation
     @State private var showHTML = false
-
-    private var artifact: HTMLArtifact? { HTMLArtifact.parse(text) }
-    private var music: MusicInfo? { MusicInfo.parse(text) }
-    private var plain: String {
-        var result = artifact.map { text.replacingOccurrences(of: $0.source, with: "") } ?? text
-        if let music { result = result.replacingOccurrences(of: music.source, with: "") }
-        return result.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Metric.standard) {
-            if !plain.isEmpty {
-                Text((try? AttributedString(markdown: plain,
-                                            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                     ?? AttributedString(plain))
+            if !presentation.attributed.characters.isEmpty {
+                Text(presentation.attributed)
                     .font(theme.font(.bubble))
                     .lineSpacing(theme.bubbleLineSpacing)
                     .textSelection(.enabled)
             }
-            if let music {
+            if let music = presentation.music {
                 MusicCard(music: music)
             }
-            if artifact != nil {
+            if presentation.artifact != nil {
                 Button { showHTML = true } label: {
                     Label("他做了一张网页卡片", systemImage: "sparkles.rectangle.stack")
                         .font(theme.font(.cardBody)).fontWeight(.medium)
@@ -270,7 +307,7 @@ private struct RichMessageText: View {
             }
         }
         .sheet(isPresented: $showHTML) {
-            if let artifact {
+            if let artifact = presentation.artifact {
                 NavigationStack {
                     HTMLWebView(html: artifact.html)
                         .ignoresSafeArea(edges: .bottom)
@@ -282,19 +319,6 @@ private struct RichMessageText: View {
                 }
             }
         }
-    }
-}
-
-private struct HTMLArtifact {
-    let source: String
-    let html: String
-
-    static func parse(_ text: String) -> HTMLArtifact? {
-        guard let regex = try? NSRegularExpression(pattern: "```html\\s*\\n([\\s\\S]*?)```"),
-              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
-              let sourceRange = Range(match.range(at: 0), in: text),
-              let bodyRange = Range(match.range(at: 1), in: text) else { return nil }
-        return HTMLArtifact(source: String(text[sourceRange]), html: String(text[bodyRange]))
     }
 }
 

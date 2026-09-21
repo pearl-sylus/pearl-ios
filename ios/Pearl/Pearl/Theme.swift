@@ -52,7 +52,6 @@ final class Theme: ObservableObject {
         case round
         case xiaolai
         case yozai
-        case moonkai
         case zhuque
 
         var id: String { rawValue }
@@ -64,7 +63,6 @@ final class Theme: ObservableObject {
             case .round: return "寒蝉圆"
             case .xiaolai: return "小赖"
             case .yozai: return "悠哉"
-            case .moonkai: return "月星楷"
             case .zhuque: return "朱雀仿宋"
             }
         }
@@ -73,10 +71,9 @@ final class Theme: ObservableObject {
             case .system: return nil
             case .wenkai: return "LXGW WenKai Screen"
             case .serif: return "Noto Serif SC"
-            case .round: return "寒蝉全圆体"
-            case .xiaolai: return "Xiaolai SC"
+            case .round: return "ChillRoundF"
+            case .xiaolai: return "Xiaolai"
             case .yozai: return "Yozai"
-            case .moonkai: return "Moon Stars Kai"
             case .zhuque: return "Zhuque Fangsong (technical preview)"
             }
         }
@@ -318,7 +315,9 @@ final class Theme: ObservableObject {
     func bubbleFill(mine: Bool) -> Color {
         let base = mine ? mineSolidHex : cardSolidHex
         let accentPart = min(1, glassTint * (mine ? 2.2 : 1.0 / 3.0))
-        return Self.mix(base, accentHex, accentPart).opacity(glassEnabled ? glassAlpha : 1)
+        return Self.mix(base, accentHex, accentPart,
+                        over: fieldSolidHex,
+                        opacity: glassEnabled ? glassAlpha : 1)
     }
 
     func panelFill() -> Color {
@@ -431,16 +430,36 @@ final class Theme: ObservableObject {
         return String(format: "#%02x%02x%02x", Int(red * 255), Int(green * 255), Int(blue * 255))
     }
 
-    private static func mix(_ base: String, _ tint: String, _ amount: Double) -> Color {
+    private static func mix(
+        _ base: String,
+        _ tint: String,
+        _ amount: Double,
+        over backdrop: String? = nil,
+        opacity: Double = 1
+    ) -> Color {
         let a = rgb(base)
         let b = rgb(tint)
         let part = min(1, max(0, amount))
         let partValue = CGFloat(part)
+        var result = (
+            a.0 + (b.0 - a.0) * partValue,
+            a.1 + (b.1 - a.1) * partValue,
+            a.2 + (b.2 - a.2) * partValue
+        )
+        if let backdrop {
+            let background = rgb(backdrop)
+            let alpha = CGFloat(min(1, max(0, opacity)))
+            result = (
+                background.0 + (result.0 - background.0) * alpha,
+                background.1 + (result.1 - background.1) * alpha,
+                background.2 + (result.2 - background.2) * alpha
+            )
+        }
         return Color(
             uiColor: UIColor(
-                red: a.0 + (b.0 - a.0) * partValue,
-                green: a.1 + (b.1 - a.1) * partValue,
-                blue: a.2 + (b.2 - a.2) * partValue,
+                red: result.0,
+                green: result.1,
+                blue: result.2,
                 alpha: 1
             )
         )

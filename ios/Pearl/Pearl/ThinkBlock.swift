@@ -8,10 +8,10 @@ struct ThinkBlock: View {
     let cut: String?
     @State private var expanded: Bool
 
-    init(text: String, cut: String? = nil, startsOpen: Bool = false) {
+    init(text: String, cut: String? = nil) {
         self.text = text
         self.cut = cut
-        _expanded = State(initialValue: startsOpen)
+        _expanded = State(initialValue: false)
     }
 
     var body: some View {

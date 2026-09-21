@@ -41,6 +41,11 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>LXGWWenKaiScreen.ttf</string>
+		<string>NotoSerifSC.ttf</string>
+		<string>ChillRoundF.ttf</string>
+		<string>Xiaolai-Regular.ttf</string>
+		<string>Yozai-Regular.ttf</string>
+		<string>ZhuqueFangsong-Regular.ttf</string>
 	</array>
 </dict>
 </plist>

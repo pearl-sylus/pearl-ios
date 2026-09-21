@@ -11,6 +11,8 @@ struct PendingImage: Identifiable {
 
 @MainActor
 final class ChatViewModel: NSObject, ObservableObject {
+    private static let pageSize = 40
+
     @Published var messages: [ChatMessage] = []
     @Published var draft = UserDefaults.standard.string(forKey: "chat-draft") ?? "" {
         didSet { UserDefaults.standard.set(draft, forKey: "chat-draft") }
@@ -44,6 +46,7 @@ final class ChatViewModel: NSObject, ObservableObject {
     private var recordingURL: URL?
     private var recordingStartedAt: Date?
     private var requestingMicrophone = false
+    private var presentations: [String: RichTextPresentation] = [:]
 
     var contextPercent: Int {
         let cap = model.contains("[1m]") ? 1_000_000 : 200_000
@@ -93,8 +96,10 @@ final class ChatViewModel: NSObject, ObservableObject {
     func reload() async {
         do {
             let page = try await api.load()
-            messages = Self.unique(page.messages)
-            hasMore = page.hasMore
+            let latest = Array(Self.unique(page.messages).suffix(Self.pageSize))
+            cachePresentations(in: latest)
+            messages = latest
+            hasMore = page.hasMore || page.messages.count > latest.count
             hasNewer = false
             bottomRequest += 1
             error = ""
@@ -107,8 +112,10 @@ final class ChatViewModel: NSObject, ObservableObject {
         guard hasMore, let first = messages.first else { return }
         do {
             let page = try await api.load(before: first.id)
-            messages = Self.unique(page.messages + messages)
-            hasMore = page.hasMore
+            let older = Array(Self.unique(page.messages).suffix(Self.pageSize))
+            cachePresentations(in: older)
+            messages = Self.unique(older + messages)
+            hasMore = page.hasMore || page.messages.count > older.count
         } catch {
             self.error = error.localizedDescription
         }
@@ -117,8 +124,9 @@ final class ChatViewModel: NSObject, ObservableObject {
     func jump(to id: String, startOfDay: Bool = false) async {
         do {
             let page = try await api.context(anchor: id,
-                                             before: startOfDay ? 0 : 35,
-                                             after: startOfDay ? 60 : 35)
+                                             before: startOfDay ? 0 : 19,
+                                             after: startOfDay ? 39 : 20)
+            cachePresentations(in: page.messages)
             messages = Self.unique(page.messages)
             hasMore = page.hasMoreBefore
             hasNewer = page.hasMoreAfter
@@ -147,6 +155,10 @@ final class ChatViewModel: NSObject, ObservableObject {
 
     func resend(_ message: ChatMessage) {
         draft = message.body
+    }
+
+    func presentation(for text: String) -> RichTextPresentation {
+        presentations[text] ?? RichTextPresentation(text)
     }
 
     func sendOrStop() async {
@@ -178,6 +190,7 @@ final class ChatViewModel: NSObject, ObservableObject {
             pendingImages = []
             pendingVoice = nil
             if !messages.contains(where: { $0.id == response.message.id }) {
+                cachePresentations(in: [response.message])
                 messages.append(response.message)
             }
             bottomRequest += 1
@@ -433,6 +446,15 @@ final class ChatViewModel: NSObject, ObservableObject {
     private static func unique(_ input: [ChatMessage]) -> [ChatMessage] {
         var seen = Set<String>()
         return input.filter { seen.insert($0.id).inserted }
+    }
+
+    private func cachePresentations(in input: [ChatMessage]) {
+        for message in input {
+            let texts = [message.body] + (message.seg ?? []).filter { $0.k == "t" }.map(\.s)
+            for text in texts where !text.isEmpty && presentations[text] == nil {
+                presentations[text] = RichTextPresentation(text)
+            }
+        }
     }
 
     private static func compressedJPEG(_ image: UIImage) -> Data? {
