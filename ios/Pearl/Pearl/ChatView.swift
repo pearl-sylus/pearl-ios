@@ -20,7 +20,13 @@ struct ChatView: View {
                             HistoryPagingButton(title: "↑ 看更早的") { Task { await model.loadOlder() } }
                         }
 
-                        ForEach(model.messages) { message in
+                        ForEach(Array(model.messages.enumerated()), id: \.element.id) { index, message in
+                            if index == 0 || !Calendar.current.isDate(
+                                message.date,
+                                inSameDayAs: model.messages[index - 1].date
+                            ) {
+                                ChatDateDivider(date: message.date)
+                            }
                             MessageRow(message: message, model: model)
                                 .id(message.id)
                                 .padding(.vertical, Theme.Metric.thinLine)
@@ -63,10 +69,15 @@ struct ChatView: View {
                         }
                         .buttonStyle(.plain)
                         .foregroundStyle(theme.accent)
+                        .shadow(color: theme.composerShadow,
+                                radius: Theme.Metric.standard,
+                                y: Theme.Metric.small)
                         .padding(Theme.Metric.large)
+                        .transition(.scale(scale: 0.84).combined(with: .opacity))
                         .accessibilityLabel("回到底部")
                     }
                 }
+                .animation(.easeOut(duration: 0.18), value: isAtBottom)
                 .onChange(of: model.bottomRequest) { _ in scrollToBottom(proxy) }
                 .onChange(of: model.liveText) { _ in scrollToBottom(proxy) }
                 .onChange(of: model.liveThinking) { _ in scrollToBottom(proxy) }
@@ -109,6 +120,25 @@ struct ChatView: View {
     private func scrollToBottom(_ proxy: ScrollViewProxy, animated: Bool = true) {
         let action = { proxy.scrollTo("chat-bottom", anchor: .bottom) }
         if animated { withAnimation(.easeOut(duration: 0.18), action) } else { action() }
+    }
+}
+
+private struct ChatDateDivider: View {
+    @Environment(\.colorScheme) private var scheme
+    @EnvironmentObject private var theme: Theme
+    let date: Date
+
+    var body: some View {
+        Text(date, format: .dateTime.month().day().weekday(.wide))
+            .font(theme.font(.metadata))
+            .foregroundStyle(theme.timestampText)
+            .padding(.horizontal, Theme.Metric.roomy)
+            .padding(.vertical, Theme.Metric.small)
+            .background(theme.panelFill(), in: Capsule())
+            .overlay { Capsule().stroke(theme.rim(for: scheme), lineWidth: Theme.Metric.hairline) }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, Theme.Metric.small)
+            .accessibilityAddTraits(.isHeader)
     }
 }
 

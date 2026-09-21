@@ -16,9 +16,16 @@ struct GlassBubble<Content: View>: View {
         content
             .padding(.horizontal, Theme.Metric.bubbleHorizontal)
             .padding(.vertical, Theme.Metric.roomy)
-            .background(theme.bubbleFill(mine: mine), in: shape)
+            .background {
+                ZStack {
+                    theme.bubbleFill(mine: mine)
+                    if theme.glassEnabled { theme.shine(for: scheme) }
+                }
+                .clipShape(shape)
+            }
             .overlay {
                 shape.stroke(theme.rim(for: scheme), lineWidth: Theme.Metric.thinLine)
+                .allowsHitTesting(false)
             }
             .frame(maxWidth: Theme.Metric.bubbleMaxWidth, alignment: mine ? .trailing : .leading)
     }

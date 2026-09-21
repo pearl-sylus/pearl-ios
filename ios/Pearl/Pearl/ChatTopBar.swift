@@ -11,10 +11,15 @@ struct ChatTopBar: View {
         ZStack {
             VStack(spacing: Theme.Metric.tiny) {
                 Text("慢慢说").font(theme.font(.navigationTitle)).foregroundStyle(theme.bubbleText)
-                Text(model.status.isEmpty ? "你说，我听着。" : model.status)
-                    .font(theme.font(.navigationSubtitle))
-                    .foregroundStyle(theme.metaText)
-                    .lineLimit(1)
+                HStack(spacing: Theme.Metric.small) {
+                    Circle()
+                        .fill(model.error.isEmpty ? theme.accent : theme.warning)
+                        .frame(width: Theme.Metric.small, height: Theme.Metric.small)
+                    Text(model.status.isEmpty ? "你说，我听着。" : model.status)
+                        .lineLimit(1)
+                }
+                .font(theme.font(.navigationSubtitle))
+                .foregroundStyle(theme.metaText)
             }
             HStack {
                 Button(action: openControls) { ContextGauge(value: model.contextPercent) }
