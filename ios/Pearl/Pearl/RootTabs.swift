@@ -2,12 +2,19 @@ import SwiftUI
 import WebKit
 
 struct RootTabs: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @StateObject private var health = HealthProbeModel()
+
     var body: some View {
         TabView {
-            ChatView()
+            ChatView(health: health)
                 .tabItem { Label("说话", systemImage: "bubble.left.and.bubble.right") }
             HomeWebView(url: ChatAPI.baseURL)
                 .tabItem { Label("家", systemImage: "house") }
+        }
+        .onChange(of: scenePhase) { phase in
+            guard phase == .active else { return }
+            Task { await health.syncIfEnabled() }
         }
     }
 }

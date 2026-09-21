@@ -6,11 +6,11 @@ import WebKit
 struct ChatView: View {
     @EnvironmentObject private var theme: Theme
     @StateObject private var model = ChatViewModel()
+    @ObservedObject var health: HealthProbeModel
     @State private var showHistory = false
     @State private var showControls = false
     @State private var showAppearance = false
     @State private var showHealth = false
-    @StateObject private var health = HealthProbeModel()
     @State private var isAtBottom = true
 
     var body: some View {

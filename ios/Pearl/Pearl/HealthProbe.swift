@@ -1,51 +1,103 @@
 import Foundation
 import HealthKit
 import SwiftUI
+import WebKit
 
-struct HealthMetric: Identifiable {
-    let id: String
-    let title: String
-    let value: String
-    let symbol: String
+private struct HealthSnapshot: Encodable {
+    let date: String
+    let steps: Int?
+    let heartRateAverage: Double?
+    let heartRateMinimum: Double?
+    let heartRateMaximum: Double?
+    let hrv: Double?
+    let bodyTemperature: Double?
+    let sleepStarts: [String]?
+    let sleepEnds: [String]?
+    let isPeriod: Bool
+
+    var hasData: Bool {
+        steps != nil || heartRateAverage != nil || hrv != nil || bodyTemperature != nil
+            || sleepStarts != nil || isPeriod
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case date, steps, hrv
+        case heartRateAverage = "heart_rate_avg"
+        case heartRateMinimum = "heart_rate_min"
+        case heartRateMaximum = "heart_rate_max"
+        case bodyTemperature = "body_temperature"
+        case sleepStarts = "sleep_start"
+        case sleepEnds = "sleep_end"
+        case isPeriod = "is_period"
+    }
 }
 
+private enum HealthSyncError: LocalizedError {
+    case unavailable
+    case noData
+    case needsLogin
+    case rejected(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .unavailable: return "这台设备不支持 Apple 健康。"
+        case .noData: return "还没有读到可同步的数据，请检查健康权限。"
+        case .needsLogin: return "先去「家」里的工程台登录一次，再回来连接。"
+        case .rejected(let message): return message
+        }
+    }
+}
+
+@MainActor
 final class HealthProbeModel: ObservableObject {
-    @Published var isLoading = false
-    @Published var message = "只读取你亲自允许的数据。"
-    @Published var rows: [HealthMetric] = []
-    @Published var lastUpdated: Date?
+    @Published private(set) var isLoading = false
+    @Published private(set) var isEnabled: Bool
+    @Published private(set) var lastSynced: Date?
+    @Published var message = "你允许后，他才能看见你的身体状态。"
 
     private let store = HKHealthStore()
+    private let enabledKey = "healthSharing.enabled"
+
+    init() {
+        isEnabled = UserDefaults.standard.bool(forKey: enabledKey)
+    }
 
     func connect() {
         guard HKHealthStore.isHealthDataAvailable() else {
-            message = "这台设备不支持 Apple 健康。"
+            message = HealthSyncError.unavailable.localizedDescription
             return
         }
-
+        guard !isLoading else { return }
         isLoading = true
-        message = "正在等待你的授权…"
-
+        message = "正在等你允许 Apple 健康…"
         store.requestAuthorization(toShare: [], read: readTypes) { [weak self] _, error in
-            guard let self else { return }
-            if let error {
-                DispatchQueue.main.async {
+            Task { @MainActor in
+                guard let self else { return }
+                if let error {
                     self.isLoading = false
                     self.message = "没有连接成功：\(error.localizedDescription)"
+                    return
                 }
-                return
+                await self.sync(markEnabled: true)
             }
-
-            Task { await self.readSummary() }
         }
+    }
+
+    func syncIfEnabled() async {
+        guard isEnabled, !isLoading else { return }
+        isLoading = true
+        await sync(markEnabled: false)
+    }
+
+    func stopSharing() {
+        isEnabled = false
+        UserDefaults.standard.set(false, forKey: enabledKey)
+        message = "已停止自动同步。Apple 健康里的原数据没有改变。"
     }
 
     private var readTypes: Set<HKObjectType> {
         let quantityIDs: [HKQuantityTypeIdentifier] = [
-            .stepCount,
-            .heartRate,
-            .heartRateVariabilitySDNN,
-            .bodyTemperature
+            .stepCount, .heartRate, .heartRateVariabilitySDNN, .bodyTemperature
         ]
         var types = Set<HKObjectType>()
         for identifier in quantityIDs {
@@ -56,126 +108,93 @@ final class HealthProbeModel: ObservableObject {
         return types
     }
 
-    private func readSummary() async {
+    private func sync(markEnabled: Bool) async {
+        defer { isLoading = false }
         do {
-            let calendar = Calendar.current
-            let now = Date()
-            let today = calendar.startOfDay(for: now)
-            let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
-            let ninetyDaysAgo = calendar.date(byAdding: .day, value: -90, to: today)!
-
-            var result: [HealthMetric] = []
-            let steps = try await sum(.stepCount, unit: .count(), from: today, to: now)
-            result.append(HealthMetric(
-                id: "steps",
-                title: "今日步数",
-                value: steps.map { String(Int($0.rounded())) } ?? "暂无数据",
-                symbol: "figure.walk"
-            ))
-
-            let heartRate = try await average(.heartRate,
-                                              unit: HKUnit.count().unitDivided(by: .minute()),
-                                              from: today,
-                                              to: now)
-            result.append(HealthMetric(
-                id: "heart",
-                title: "平均心率",
-                value: number(heartRate, suffix: " 次/分"),
-                symbol: "heart.fill"
-            ))
-
-            let hrv = try await average(.heartRateVariabilitySDNN,
-                                        unit: .secondUnit(with: .milli),
-                                        from: yesterday,
-                                        to: now)
-            result.append(HealthMetric(
-                id: "hrv",
-                title: "最近 HRV",
-                value: number(hrv, suffix: " 毫秒"),
-                symbol: "waveform.path.ecg"
-            ))
-
-            let temperature = try await average(.bodyTemperature,
-                                                unit: .degreeCelsius(),
-                                                from: ninetyDaysAgo,
-                                                to: now)
-            result.append(HealthMetric(
-                id: "temperature",
-                title: "体温",
-                value: number(temperature, suffix: " ℃", decimals: 1),
-                symbol: "thermometer.medium"
-            ))
-            result.append(HealthMetric(
-                id: "sleep",
-                title: "昨夜睡眠",
-                value: try await latestSleep(from: yesterday, to: now),
-                symbol: "moon.zzz.fill"
-            ))
-            result.append(HealthMetric(
-                id: "period",
-                title: "最近经期",
-                value: try await latestPeriod(from: ninetyDaysAgo, to: now),
-                symbol: "drop.fill"
-            ))
-
-            await MainActor.run {
-                self.rows = result
-                self.lastUpdated = now
-                self.message = "已从这台 iPhone 读取。"
-                self.isLoading = false
+            let snapshot = try await readSnapshot()
+            guard snapshot.hasData else { throw HealthSyncError.noData }
+            try await upload(snapshot)
+            if markEnabled {
+                isEnabled = true
+                UserDefaults.standard.set(true, forKey: enabledKey)
             }
+            lastSynced = Date()
+            message = "同步好了，他现在能看见你的最新状态。"
         } catch {
-            await MainActor.run {
-                self.message = "已经连接，但读取时出错：\(error.localizedDescription)"
-                self.isLoading = false
+            message = error.localizedDescription
+        }
+    }
+
+    private func readSnapshot() async throws -> HealthSnapshot {
+        let calendar = Calendar.current
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+        let ninetyDaysAgo = calendar.date(byAdding: .day, value: -90, to: today)!
+        let heartUnit = HKUnit.count().unitDivided(by: .minute())
+        let sleep = try await sleepSegments(from: yesterday, to: now)
+
+        return HealthSnapshot(
+            date: DateFormatter.healthDate.string(from: now),
+            steps: try await quantity(.stepCount, unit: .count(), kind: .sum, from: today, to: now).map { Int($0.rounded()) },
+            heartRateAverage: try await quantity(.heartRate, unit: heartUnit, kind: .average, from: today, to: now),
+            heartRateMinimum: try await quantity(.heartRate, unit: heartUnit, kind: .minimum, from: today, to: now),
+            heartRateMaximum: try await quantity(.heartRate, unit: heartUnit, kind: .maximum, from: today, to: now),
+            hrv: try await quantity(.heartRateVariabilitySDNN, unit: .secondUnit(with: .milli), kind: .average, from: yesterday, to: now),
+            bodyTemperature: try await quantity(.bodyTemperature, unit: .degreeCelsius(), kind: .average, from: ninetyDaysAgo, to: now),
+            sleepStarts: sleep.starts.isEmpty ? nil : sleep.starts,
+            sleepEnds: sleep.ends.isEmpty ? nil : sleep.ends,
+            isPeriod: try await hasPeriodSample(from: today, to: now)
+        )
+    }
+
+    private enum StatisticKind {
+        case sum, average, minimum, maximum
+
+        var option: HKStatisticsOptions {
+            switch self {
+            case .sum: return .cumulativeSum
+            case .average: return .discreteAverage
+            case .minimum: return .discreteMin
+            case .maximum: return .discreteMax
             }
         }
     }
 
-    private func sum(_ identifier: HKQuantityTypeIdentifier,
-                     unit: HKUnit,
-                     from start: Date,
-                     to end: Date) async throws -> Double? {
-        try await statistic(identifier, option: .cumulativeSum, unit: unit, from: start, to: end)
-    }
-
-    private func average(_ identifier: HKQuantityTypeIdentifier,
-                         unit: HKUnit,
-                         from start: Date,
-                         to end: Date) async throws -> Double? {
-        try await statistic(identifier, option: .discreteAverage, unit: unit, from: start, to: end)
-    }
-
-    private func statistic(_ identifier: HKQuantityTypeIdentifier,
-                           option: HKStatisticsOptions,
-                           unit: HKUnit,
-                           from start: Date,
-                           to end: Date) async throws -> Double? {
+    private func quantity(_ identifier: HKQuantityTypeIdentifier,
+                          unit: HKUnit,
+                          kind: StatisticKind,
+                          from start: Date,
+                          to end: Date) async throws -> Double? {
         guard let type = HKObjectType.quantityType(forIdentifier: identifier) else { return nil }
         let predicate = HKQuery.predicateForSamples(withStart: start, end: end)
         return try await withCheckedThrowingContinuation { continuation in
             let query = HKStatisticsQuery(quantityType: type,
                                           quantitySamplePredicate: predicate,
-                                          options: option) { _, statistics, error in
+                                          options: kind.option) { _, statistics, error in
                 if let error {
                     if (error as? HKError)?.code == .errorNoData {
                         continuation.resume(returning: nil)
-                        return
+                    } else {
+                        continuation.resume(throwing: error)
                     }
-                    continuation.resume(throwing: error)
                     return
                 }
-                let quantity = option == .cumulativeSum
-                    ? statistics?.sumQuantity()
-                    : statistics?.averageQuantity()
-                continuation.resume(returning: quantity?.doubleValue(for: unit))
+                let value: HKQuantity?
+                switch kind {
+                case .sum: value = statistics?.sumQuantity()
+                case .average: value = statistics?.averageQuantity()
+                case .minimum: value = statistics?.minimumQuantity()
+                case .maximum: value = statistics?.maximumQuantity()
+                }
+                continuation.resume(returning: value?.doubleValue(for: unit))
             }
             store.execute(query)
         }
     }
 
-    private func latestSleep(from start: Date, to end: Date) async throws -> String {
-        guard let type = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return "暂无数据" }
+    private func sleepSegments(from start: Date, to end: Date) async throws -> (starts: [String], ends: [String]) {
+        guard let type = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return ([], []) }
         let samples = try await categorySamples(type, from: start, to: end)
         let asleepValues = Set([
             HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue,
@@ -183,17 +202,16 @@ final class HealthProbeModel: ObservableObject {
             HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
             HKCategoryValueSleepAnalysis.asleepREM.rawValue
         ])
-        let asleep = samples.filter { asleepValues.contains($0.value) }
-        guard let first = asleep.map(\.startDate).min(),
-              let last = asleep.map(\.endDate).max() else { return "暂无数据" }
-        return "\(time(first))–\(time(last))"
+        let asleep = samples.filter { asleepValues.contains($0.value) }.sorted { $0.startDate < $1.startDate }
+        let formatter = ISO8601DateFormatter()
+        return (asleep.map { formatter.string(from: $0.startDate) },
+                asleep.map { formatter.string(from: $0.endDate) })
     }
 
-    private func latestPeriod(from start: Date, to end: Date) async throws -> String {
-        guard let type = HKObjectType.categoryType(forIdentifier: .menstrualFlow) else { return "暂无数据" }
+    private func hasPeriodSample(from start: Date, to end: Date) async throws -> Bool {
+        guard let type = HKObjectType.categoryType(forIdentifier: .menstrualFlow) else { return false }
         let samples = try await categorySamples(type, from: start, to: end)
-        guard let latest = samples.max(by: { $0.startDate < $1.startDate }) else { return "暂无数据" }
-        return DateFormatter.healthDay.string(from: latest.startDate)
+        return !samples.isEmpty
     }
 
     private func categorySamples(_ type: HKCategoryType,
@@ -208,9 +226,9 @@ final class HealthProbeModel: ObservableObject {
                 if let error {
                     if (error as? HKError)?.code == .errorNoData {
                         continuation.resume(returning: [])
-                        return
+                    } else {
+                        continuation.resume(throwing: error)
                     }
-                    continuation.resume(throwing: error)
                     return
                 }
                 continuation.resume(returning: samples as? [HKCategorySample] ?? [])
@@ -219,13 +237,30 @@ final class HealthProbeModel: ObservableObject {
         }
     }
 
-    private func number(_ value: Double?, suffix: String, decimals: Int = 0) -> String {
-        guard let value else { return "暂无数据" }
-        return String(format: "%.*f", decimals, value) + suffix
+    private func upload(_ snapshot: HealthSnapshot) async throws {
+        let cookies = await webCookies()
+        let sessionCookie = cookies.first { $0.name == "wk" && $0.domain.contains("pearl-sylus.org") }
+        guard let sessionCookie else { throw HealthSyncError.needsLogin }
+
+        var request = URLRequest(url: URL(string: "/api/health/native", relativeTo: ChatAPI.baseURL)!.absoluteURL)
+        request.httpMethod = "POST"
+        request.httpShouldHandleCookies = false
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("\(sessionCookie.name)=\(sessionCookie.value)", forHTTPHeaderField: "Cookie")
+        request.httpBody = try JSONEncoder().encode(snapshot)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
+        if http.statusCode == 401 { throw HealthSyncError.needsLogin }
+        guard (200..<300).contains(http.statusCode) else {
+            let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            throw HealthSyncError.rejected(object?["error"] as? String ?? "健康管道暂时没有收下。")
+        }
     }
 
-    private func time(_ date: Date) -> String {
-        DateFormatter.healthTime.string(from: date)
+    private func webCookies() async -> [HTTPCookie] {
+        await withCheckedContinuation { continuation in
+            WKWebsiteDataStore.default().httpCookieStore.getAllCookies { continuation.resume(returning: $0) }
+        }
     }
 }
 
@@ -235,28 +270,30 @@ struct HealthProbeView: View {
     @Environment(\.colorScheme) private var scheme
     @EnvironmentObject private var theme: Theme
 
-    private let columns = [GridItem(.flexible()), GridItem(.flexible())]
-
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.Metric.section) {
                     header
 
-                    if !model.rows.isEmpty {
-                        LazyVGrid(columns: columns, spacing: Theme.Metric.standard) {
-                            ForEach(model.rows) { metric in
-                                metricCard(metric)
-                            }
-                        }
+                    VStack(alignment: .leading, spacing: Theme.Metric.large) {
+                        shareRow("heart.fill", "心率、HRV 与体温")
+                        shareRow("figure.walk", "今天的步数")
+                        shareRow("moon.zzz.fill", "昨夜睡眠与经期状态")
+                    }
+                    .padding(Theme.Metric.section)
+                    .background(theme.panelFill(), in: RoundedRectangle(cornerRadius: Theme.Metric.bubbleRadius))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: Theme.Metric.bubbleRadius)
+                            .stroke(theme.rim(for: scheme), lineWidth: Theme.Metric.hairline)
                     }
 
                     Button {
                         model.connect()
                     } label: {
                         HStack(spacing: Theme.Metric.standard) {
-                            if model.isLoading { ProgressView().tint(.white) }
-                            Text(model.isLoading ? "正在读取…" : model.rows.isEmpty ? "连接 Apple 健康" : "刷新数据")
+                            if model.isLoading { ProgressView().tint(theme.white) }
+                            Text(model.isLoading ? "正在同步…" : model.isEnabled ? "现在同步给他" : "允许并同步给他")
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, Theme.Metric.small)
@@ -264,7 +301,13 @@ struct HealthProbeView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(model.isLoading)
 
-                    Label("数据留在这台手机上；后台同步仍由你现有的快捷指令负责。",
+                    if model.isEnabled {
+                        Button("停止自动同步") { model.stopSharing() }
+                            .frame(maxWidth: .infinity)
+                            .foregroundStyle(theme.warning)
+                    }
+
+                    Label("每次打开 Purr Den 时刷新；现有快捷指令继续负责后台补送。",
                           systemImage: "lock.fill")
                         .font(theme.font(.metadata))
                         .foregroundStyle(theme.metaText)
@@ -273,7 +316,7 @@ struct HealthProbeView: View {
                 .padding(Theme.Metric.detailPadding)
             }
             .background(ChatBackground())
-            .navigationTitle("身体")
+            .navigationTitle("身体连接")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -286,21 +329,22 @@ struct HealthProbeView: View {
 
     private var header: some View {
         HStack(spacing: Theme.Metric.large) {
-            Image(systemName: "heart.text.square.fill")
-                .font(.system(size: 32, weight: .medium))
+            Image(systemName: model.isEnabled ? "heart.fill" : "heart")
+                .font(.system(size: 30, weight: .medium))
                 .foregroundStyle(theme.white)
                 .frame(width: 56, height: 56)
-                .background(theme.warning.gradient, in: RoundedRectangle(cornerRadius: Theme.Metric.cardRadius))
+                .background((model.isEnabled ? theme.success : theme.accent).gradient,
+                            in: RoundedRectangle(cornerRadius: Theme.Metric.cardRadius))
 
             VStack(alignment: .leading, spacing: Theme.Metric.small) {
-                Text("Apple 健康")
+                Text("让他看见你的状态")
                     .font(theme.font(.cardTitle))
                     .foregroundStyle(theme.bubbleText)
                 Text(model.message)
                     .font(theme.font(.cardBody))
                     .foregroundStyle(theme.metaText)
-                if let date = model.lastUpdated {
-                    Text("更新于 \(date.formatted(date: .omitted, time: .shortened))")
+                if let date = model.lastSynced {
+                    Text("上次同步 \(date.formatted(date: .omitted, time: .shortened))")
                         .font(theme.font(.metadata))
                         .foregroundStyle(theme.timestampText)
                 }
@@ -315,42 +359,20 @@ struct HealthProbeView: View {
         }
     }
 
-    private func metricCard(_ metric: HealthMetric) -> some View {
-        VStack(alignment: .leading, spacing: Theme.Metric.standard) {
-            Image(systemName: metric.symbol)
-                .font(theme.font(.control).weight(.semibold))
-                .foregroundStyle(metric.id == "heart" ? theme.warning : theme.accent)
-            Text(metric.title)
-                .font(theme.font(.metadata))
-                .foregroundStyle(theme.metaText)
-            Text(metric.value)
-                .font(theme.font(.cardTitle))
-                .foregroundStyle(theme.bubbleText)
-                .lineLimit(2)
-                .minimumScaleFactor(0.75)
-        }
-        .frame(maxWidth: .infinity, minHeight: 92, alignment: .leading)
-        .padding(Theme.Metric.large)
-        .background(theme.panelFill(), in: RoundedRectangle(cornerRadius: Theme.Metric.cardRadius))
-        .overlay {
-            RoundedRectangle(cornerRadius: Theme.Metric.cardRadius)
-                .stroke(theme.rim(for: scheme), lineWidth: Theme.Metric.hairline)
+    private func shareRow(_ symbol: String, _ text: String) -> some View {
+        Label {
+            Text(text).font(theme.font(.cardBody)).foregroundStyle(theme.bubbleText)
+        } icon: {
+            Image(systemName: symbol).foregroundStyle(theme.accent)
         }
     }
 }
 
 private extension DateFormatter {
-    static let healthTime: DateFormatter = {
+    static let healthDate: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = .current
-        formatter.dateFormat = "HH:mm"
-        return formatter
-    }()
-
-    static let healthDay: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = .current
-        formatter.dateFormat = "yyyy 年 M 月 d 日"
+        formatter.locale = Locale(identifier: "en_CA")
+        formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
 }
