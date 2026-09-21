@@ -5,6 +5,7 @@ struct ChatTopBar: View {
     @ObservedObject var model: ChatViewModel
     let openHistory: () -> Void
     let openControls: () -> Void
+    let openHealth: () -> Void
     let openAppearance: () -> Void
 
     var body: some View {
@@ -29,6 +30,10 @@ struct ChatTopBar: View {
                     topButton("magnifyingglass")
                 }
                 .accessibilityLabel("搜索聊天")
+                Button(action: openHealth) {
+                    topButton("heart.text.square")
+                }
+                .accessibilityLabel("Apple 健康")
                 Button(action: openAppearance) {
                     topButton("paintpalette")
                 }

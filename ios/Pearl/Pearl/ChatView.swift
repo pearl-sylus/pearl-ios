@@ -9,6 +9,8 @@ struct ChatView: View {
     @State private var showHistory = false
     @State private var showControls = false
     @State private var showAppearance = false
+    @State private var showHealth = false
+    @StateObject private var health = HealthProbeModel()
     @State private var isAtBottom = true
 
     var body: some View {
@@ -97,6 +99,7 @@ struct ChatView: View {
                     model: model,
                     openHistory: { showHistory = true },
                     openControls: { showControls = true },
+                    openHealth: { showHealth = true },
                     openAppearance: { showAppearance = true }
                 )
             }
@@ -112,6 +115,11 @@ struct ChatView: View {
             }
             .sheet(isPresented: $showHistory) { HistoryFinder(model: model) }
             .sheet(isPresented: $showControls) { ChatControls(model: model) }
+            .sheet(isPresented: $showHealth) {
+                HealthProbeView(model: health)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+            }
             .sheet(isPresented: $showAppearance) { AppearanceSettings() }
         }
         .onDisappear { model.stop() }
