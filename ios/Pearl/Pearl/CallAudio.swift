@@ -34,6 +34,10 @@ final class CallAudio: ObservableObject {
     private var utteranceMs = 0.0
     private var captured: [Float] = []
     private var preroll: [[Float]] = []
+    // "我说完了"按钮的兜底缓冲(ios-app-where-it-breaks 02 第九堵墙):跟 VAD 完全无关,只要在收音就一直攒,按帧分块存,25 秒滚动
+    private var rolling: [[Float]] = []
+    private var rollingSamples = 0
+    private let rollingMaxSamples = 16_000 * 25
 
     private var queue: [URL] = []
     private var player: AVAudioPlayer?
@@ -87,7 +91,10 @@ final class CallAudio: ObservableObject {
     // MARK: VAD
 
     private func consume(_ frame: [Float]) {
-        guard !gate, !frame.isEmpty else { return }
+        guard !frame.isEmpty else { return }
+        rolling.append(frame); rollingSamples += frame.count
+        while rollingSamples > rollingMaxSamples, let first = rolling.first { rollingSamples -= first.count; rolling.removeFirst() }
+        guard !gate else { return }
         let frameMs = Double(frame.count) / outFormat.sampleRate * 1000
         var sum: Float = 0
         for sample in frame { sum += sample * sample }
@@ -140,6 +147,18 @@ final class CallAudio: ObservableObject {
         hold()
         guard voicedMs >= minUtteranceMs, !samples.isEmpty else { listen(); return }
         onUtterance?(Self.wav(samples, sampleRate: 16_000))
+    }
+
+    /// 她按了"我说完了":VAD 正在攒的优先;VAD 哑了就用滚动缓冲最近 12 秒;缓冲里真没声音→返回 nil,界面要当场说是麦克风的问题
+    func flushUtterance() -> Data? {
+        var samples: [Float]
+        if inUtterance, !captured.isEmpty { samples = captured } else { samples = rolling.suffix(60).flatMap { $0 } }   // 60 帧≈16k*4096/48k 每帧≈1365 样本 → 约 5 秒;取最近的
+        resetVad(); isHearing = false; hold()
+        var energy: Float = 0
+        for v in samples { energy += v * v }
+        let rms = samples.isEmpty ? 0 : (energy / Float(samples.count)).squareRoot()
+        guard rms > 0.004 else { return nil }
+        return Self.wav(samples, sampleRate: 16_000)
     }
 
     static func wav(_ samples: [Float], sampleRate: Int) -> Data {

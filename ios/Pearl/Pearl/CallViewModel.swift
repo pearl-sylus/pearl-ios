@@ -86,6 +86,17 @@ final class CallViewModel: ObservableObject {
         state = "已回：\(why)"
     }
 
+    /// "我说完了"手动兜底(VAD 没切出来时用)
+    func doneSpeaking() {
+        guard phase == .live || phase == .lingering || phase == .connecting else { return }
+        guard let wav = audio.flushUtterance() else {
+            state = "我听不到你——麦克风好像没在收音"
+            audio.listen()
+            return
+        }
+        herTurn(wav)
+    }
+
     func hangUp() {
         finish(message: "你挂了电话。")
     }

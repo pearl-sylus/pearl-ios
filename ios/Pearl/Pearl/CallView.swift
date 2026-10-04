@@ -125,7 +125,18 @@ struct CallView: View {
                 }
             }
         case .connecting, .live, .lingering:
-            bigButton("xmark", fill: theme.warning, label: "挂断") { model.hangUp() }
+            VStack(spacing: Theme.Metric.section) {
+                Button { model.doneSpeaking() } label: {
+                    Text("我说完了")
+                        .font(theme.font(.control))
+                        .foregroundStyle(theme.bubbleText)
+                        .padding(.horizontal, Theme.Metric.section)
+                        .padding(.vertical, Theme.Metric.roomy)
+                        .background(theme.composerButtonFill, in: Capsule())
+                }
+                .accessibilityLabel("我说完了，把刚才说的发给他")
+                bigButton("xmark", fill: theme.warning, label: "挂断") { model.hangUp() }
+            }
         case .ended, .failed:
             Button(action: dismiss) {
                 Text("回去打字说")
