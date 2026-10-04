@@ -19,6 +19,17 @@ struct ChatAPI {
         return data
     }
 
+    // 10.5 原生首页/日子(9.13 做过,这次找回)
+    func homeDashboard() async throws -> HomeDashboard {
+        var request = URLRequest(url: url("/api/dash"))
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        return try JSONDecoder().decode(HomeDashboard.self, from: await data(for: request))
+    }
+
+    func days() async throws -> DaysResponse {
+        try JSONDecoder().decode(DaysResponse.self, from: await data(for: URLRequest(url: url("/api/days"))))
+    }
+
     func load(before: String? = nil) async throws -> ChatPage {
         let query = before.map { [URLQueryItem(name: "before", value: $0)] } ?? []
         var request = URLRequest(url: url("/api/chat", query: query))

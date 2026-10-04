@@ -7,6 +7,7 @@ struct ChatTopBar: View {
     let openControls: () -> Void
     let openHealth: () -> Void
     let openAppearance: () -> Void
+    var openCall: () -> Void = {}
 
     var body: some View {
         ZStack {
@@ -26,6 +27,10 @@ struct ChatTopBar: View {
                 Button(action: openControls) { ContextGauge(value: model.contextPercent) }
                     .accessibilityLabel("聊天设置，记忆水位 \(model.contextPercent)%")
                 Spacer()
+                Button(action: openCall) {
+                    topButton("phone")
+                }
+                .accessibilityLabel("打电话给他")
                 Button(action: openHistory) {
                     topButton("magnifyingglass")
                 }

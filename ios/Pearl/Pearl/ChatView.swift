@@ -4,6 +4,7 @@ import UIKit
 import WebKit
 
 struct ChatView: View {
+    @EnvironmentObject private var calls: CallCoordinator
     @EnvironmentObject private var theme: Theme
     @StateObject private var model = ChatViewModel()
     @ObservedObject var health: HealthProbeModel
@@ -100,7 +101,8 @@ struct ChatView: View {
                     openHistory: { showHistory = true },
                     openControls: { showControls = true },
                     openHealth: { showHealth = true },
-                    openAppearance: { showAppearance = true }
+                    openAppearance: { showAppearance = true },
+                    openCall: { calls.dial() }
                 )
             }
             .safeAreaInset(edge: .bottom, spacing: Theme.Metric.zero) {

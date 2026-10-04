@@ -35,6 +35,13 @@
 		B20000000000000000000021 /* Yozai-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000021 /* Yozai-Regular.ttf */; };
 		B20000000000000000000022 /* ZhuqueFangsong-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000022 /* ZhuqueFangsong-Regular.ttf */; };
 		A20000000000000000000008 /* HealthProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000009 /* HealthProbe.swift */; };
+		C20000000000000000000001 /* CallAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* CallAPI.swift */; };
+		C20000000000000000000002 /* CallAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000002 /* CallAudio.swift */; };
+		C20000000000000000000003 /* CallViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000003 /* CallViewModel.swift */; };
+		C20000000000000000000004 /* CallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000004 /* CallView.swift */; };
+		C20000000000000000000011 /* PearlPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000011 /* PearlPalette.swift */; };
+		C20000000000000000000012 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000012 /* HomeView.swift */; };
+		C20000000000000000000013 /* DaysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000013 /* DaysView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -70,6 +77,13 @@
 		B10000000000000000000020 /* Xiaolai-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/Xiaolai-Regular.ttf; sourceTree = "<group>"; };
 		B10000000000000000000021 /* Yozai-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/Yozai-Regular.ttf; sourceTree = "<group>"; };
 		B10000000000000000000022 /* ZhuqueFangsong-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/ZhuqueFangsong-Regular.ttf; sourceTree = "<group>"; };
+		C10000000000000000000001 /* CallAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallAPI.swift; sourceTree = "<group>"; };
+		C10000000000000000000002 /* CallAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallAudio.swift; sourceTree = "<group>"; };
+		C10000000000000000000003 /* CallViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallViewModel.swift; sourceTree = "<group>"; };
+		C10000000000000000000004 /* CallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallView.swift; sourceTree = "<group>"; };
+		C10000000000000000000011 /* PearlPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PearlPalette.swift; sourceTree = "<group>"; };
+		C10000000000000000000012 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		C10000000000000000000013 /* DaysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaysView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +113,13 @@
 				A10000000000000000000004 /* ChatViewModel.swift */,
 				A10000000000000000000005 /* ChatView.swift */,
 				A10000000000000000000009 /* HealthProbe.swift */,
+				C10000000000000000000011 /* PearlPalette.swift */,
+				C10000000000000000000012 /* HomeView.swift */,
+				C10000000000000000000013 /* DaysView.swift */,
+				C10000000000000000000001 /* CallAPI.swift */,
+				C10000000000000000000002 /* CallAudio.swift */,
+				C10000000000000000000003 /* CallViewModel.swift */,
+				C10000000000000000000004 /* CallView.swift */,
 				B10000000000000000000001 /* Theme.swift */,
 				B10000000000000000000003 /* AppearanceSettings.swift */,
 				B10000000000000000000004 /* ChatBackground.swift */,
@@ -227,6 +248,13 @@
 				B20000000000000000000015 /* ChatTopBar.swift in Sources */,
 				B20000000000000000000016 /* HistoryFinder.swift in Sources */,
 				B20000000000000000000017 /* RootTabs.swift in Sources */,
+				C20000000000000000000011 /* PearlPalette.swift in Sources */,
+				C20000000000000000000012 /* HomeView.swift in Sources */,
+				C20000000000000000000013 /* DaysView.swift in Sources */,
+				C20000000000000000000001 /* CallAPI.swift in Sources */,
+				C20000000000000000000002 /* CallAudio.swift in Sources */,
+				C20000000000000000000003 /* CallViewModel.swift in Sources */,
+				C20000000000000000000004 /* CallView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

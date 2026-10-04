@@ -5,12 +5,23 @@ struct RootTabs: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var health = HealthProbeModel()
 
+    @State private var tab = 1
+
     var body: some View {
-        TabView {
+        TabView(selection: $tab) {
+            // 10.5 她要的:首页和日子回到原生(9.13 的版本找回),网页版留一格进冰箱门/通话记录/设置
+            HomeView { tab = 1 }
+                .tabItem { Label("家", systemImage: "house") }
+                .tag(0)
             ChatView(health: health)
                 .tabItem { Label("说话", systemImage: "bubble.left.and.bubble.right") }
+                .tag(1)
+            DaysView()
+                .tabItem { Label("日子", systemImage: "calendar") }
+                .tag(2)
             HomeWebView(url: ChatAPI.baseURL)
-                .tabItem { Label("家", systemImage: "house") }
+                .tabItem { Label("更多", systemImage: "square.grid.2x2") }
+                .tag(3)
         }
         .onChange(of: scenePhase) { phase in
             guard phase == .active else { return }
