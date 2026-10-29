@@ -102,7 +102,8 @@ struct ChatView: View {
                     openControls: { showControls = true },
                     openHealth: { showHealth = true },
                     openAppearance: { showAppearance = true },
-                    openCall: { calls.dial() }
+                    openCall: { calls.dial() },
+                    testSystemCall: { calls.scheduleTestCall() }
                 )
             }
             .safeAreaInset(edge: .bottom, spacing: Theme.Metric.zero) {

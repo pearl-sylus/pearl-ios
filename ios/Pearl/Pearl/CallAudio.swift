@@ -14,6 +14,10 @@ final class CallAudio: ObservableObject {
     var onUtterance: (@MainActor (Data) -> Void)?
     /// 她刚开口(用来作废老轮、掐声音)
     var onHearStart: (@MainActor () -> Void)?
+    /// 10.30 系统(CallKit)管声音会话:开、关都由系统做,这边不碰 setActive
+    var systemManaged = false
+    /// 系统通话界面上的静音:麦照开着(滚动缓冲也不攒),只是不听、不切句
+    var muted = false
 
     private let engine = AVAudioEngine()
     private let pipe = ResamplePipe()   // 音频线程用,不在主 actor 上
@@ -91,7 +95,7 @@ final class CallAudio: ObservableObject {
     // MARK: VAD
 
     private func consume(_ frame: [Float]) {
-        guard !frame.isEmpty else { return }
+        guard !frame.isEmpty, !muted else { return }
         rolling.append(frame); rollingSamples += frame.count
         while rollingSamples > rollingMaxSamples, let first = rolling.first { rollingSamples -= first.count; rolling.removeFirst() }
         guard !gate else { return }
@@ -236,7 +240,7 @@ final class CallAudio: ObservableObject {
     func stopAll() {
         bargeIn()
         stopMic()
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        if !systemManaged { try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation) }
     }
 }
 

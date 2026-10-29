@@ -54,6 +54,16 @@ struct CallAPI {
     }
 
     func answer(id: String) async throws { _ = try await post("/api/voice/call/\(id)/answer") }
+
+    /// 10.30 VoIP 推送的 token 交给家里(他打来时用它把 App 叫醒)。Release 包走正式推送环境
+    func registerVoIP(token: String) async throws {
+        #if DEBUG
+        let env = "sandbox"
+        #else
+        let env = "production"
+        #endif
+        _ = try await post("/api/voice/voip-token", json: ["token": token, "env": env, "bundle": Bundle.main.bundleIdentifier ?? ""])
+    }
     func end(id: String) async throws { _ = try await post("/api/voice/call/\(id)/end") }
     func reject(id: String, reason: String) async throws {
         _ = try await post("/api/voice/call/\(id)/reject", json: ["reason": reason])

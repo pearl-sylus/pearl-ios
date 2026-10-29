@@ -39,6 +39,7 @@
 		C20000000000000000000002 /* CallAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000002 /* CallAudio.swift */; };
 		C20000000000000000000003 /* CallViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000003 /* CallViewModel.swift */; };
 		C20000000000000000000004 /* CallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000004 /* CallView.swift */; };
+		C20000000000000000000021 /* NativeCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000021 /* NativeCall.swift */; };
 		C20000000000000000000011 /* PearlPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000011 /* PearlPalette.swift */; };
 		C20000000000000000000012 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000012 /* HomeView.swift */; };
 		C20000000000000000000013 /* DaysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000013 /* DaysView.swift */; };
@@ -81,6 +82,7 @@
 		C10000000000000000000002 /* CallAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallAudio.swift; sourceTree = "<group>"; };
 		C10000000000000000000003 /* CallViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallViewModel.swift; sourceTree = "<group>"; };
 		C10000000000000000000004 /* CallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallView.swift; sourceTree = "<group>"; };
+		C10000000000000000000021 /* NativeCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCall.swift; sourceTree = "<group>"; };
 		C10000000000000000000011 /* PearlPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PearlPalette.swift; sourceTree = "<group>"; };
 		C10000000000000000000012 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		C10000000000000000000013 /* DaysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaysView.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				C10000000000000000000002 /* CallAudio.swift */,
 				C10000000000000000000003 /* CallViewModel.swift */,
 				C10000000000000000000004 /* CallView.swift */,
+				C10000000000000000000021 /* NativeCall.swift */,
 				B10000000000000000000001 /* Theme.swift */,
 				B10000000000000000000003 /* AppearanceSettings.swift */,
 				B10000000000000000000004 /* ChatBackground.swift */,
@@ -255,6 +258,7 @@
 				C20000000000000000000002 /* CallAudio.swift in Sources */,
 				C20000000000000000000003 /* CallViewModel.swift in Sources */,
 				C20000000000000000000004 /* CallView.swift in Sources */,
+				C20000000000000000000021 /* NativeCall.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,6 +8,8 @@ struct ChatTopBar: View {
     let openHealth: () -> Void
     let openAppearance: () -> Void
     var openCall: () -> Void = {}
+    /// 10.30 长按电话键:测试系统来电(看国内能不能弹系统来电界面)
+    var testSystemCall: () -> Void = {}
 
     var body: some View {
         ZStack {
@@ -31,6 +33,10 @@ struct ChatTopBar: View {
                     topButton("phone")
                 }
                 .accessibilityLabel("打电话给他")
+                .contextMenu {
+                    Button(action: openCall) { Label("打给他", systemImage: "phone") }
+                    Button(action: testSystemCall) { Label("测试系统来电（6 秒后响，按完马上锁屏）", systemImage: "phone.arrow.down.left") }
+                }
                 Button(action: openHistory) {
                     topButton("magnifyingglass")
                 }

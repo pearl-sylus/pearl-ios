@@ -1,16 +1,13 @@
 import SwiftUI
+import UIKit
 
 /// 原生通话页(10.5):全屏,来电 → 接/挂/快捷回 → 通话中字幕 + 挂断。样式跟聊天页同一套 Theme。
 struct CallView: View {
     @EnvironmentObject private var theme: Theme
     @Environment(\.colorScheme) private var scheme
-    @StateObject private var model: CallViewModel
+    // 10.30 通话本身归 CallCoordinator 管(锁屏上接起来时这页还没出来,电话也得先通),这页只显示
+    @ObservedObject var model: CallViewModel
     let dismiss: () -> Void
-
-    init(callId: String, dismiss: @escaping () -> Void) {
-        _model = StateObject(wrappedValue: CallViewModel(callId: callId))
-        self.dismiss = dismiss
-    }
 
     var body: some View {
         ZStack {
@@ -191,21 +188,109 @@ struct CallHandle: Identifiable, Equatable {
 
 @MainActor
 final class CallCoordinator: ObservableObject {
+    static let shared = CallCoordinator()
+
     @Published var active: CallHandle?
+    /// 测试系统来电的结果,App 上弹一下
+    @Published var notice: String?
+    /// 正在打的这通(页面关了也留着,直到下一通)
+    private(set) var model: CallViewModel?
+    private var systemAudioActive = false
+    private var keepAlive: UIBackgroundTaskIdentifier = .invalid
+
+    /// 页面拿发动机:有这通就用,没有就现起一个(不在这里改 @Published,页面渲染时会调)
+    func viewModel(for handle: CallHandle) -> CallViewModel {
+        if let model, model.callId == handle.id { return model }
+        let fresh = CallViewModel(callId: handle.id)
+        model = fresh
+        return fresh
+    }
+
+    @discardableResult
+    private func show(_ id: String) -> CallViewModel {
+        let current = viewModel(for: CallHandle(id: id))
+        active = CallHandle(id: id)
+        return current
+    }
+
+    func close() {
+        active = nil
+        if let model, model.phase == .ended || model.phase == .failed || model.phase == .loading { self.model = nil }
+    }
 
     func open(url: URL) -> Bool {
         guard url.scheme?.lowercased() == "pearlden", url.host?.lowercased() == "call" else { return false }
         let id = URLComponents(url: url, resolvingAgainstBaseURL: false)?
             .queryItems?.first(where: { $0.name == "id" || $0.name == "call" })?.value
         guard let id, !id.isEmpty else { return false }
-        active = CallHandle(id: id)
+        show(id)
         return true
     }
 
     /// 她打给他
     func dial(reason: String = "想你了") {
         Task {
-            if let id = try? await CallAPI().start(reason: reason) { active = CallHandle(id: id) }
+            if let id = try? await CallAPI().start(reason: reason) { show(id) }
         }
+    }
+
+    // MARK: 10.30 系统来电(CallKit)
+
+    func answerFromSystem(id: String, uuid: UUID) {
+        show(id).answerViaSystem(uuid: uuid, audioReady: systemAudioActive)
+    }
+
+    /// 测试来电接起来了:家里起一通(她打给他那条路),接上就是真跟他说话
+    func answerTestFromSystem(uuid: UUID) {
+        Task {
+            guard let id = try? await CallAPI().start(reason: "试一下新的来电") else {
+                NativeCallCenter.shared.reportEnded(uuid: uuid, failed: true)
+                notice = "测试来电接起来了，但连不上家里"
+                return
+            }
+            NativeCallCenter.shared.bind(uuid: uuid, id: id)
+            answerFromSystem(id: id, uuid: uuid)
+        }
+    }
+
+    func endFromSystem(id: String?, answered: Bool) {
+        if let id, let model, model.callId == id {
+            model.hangUpFromSystem()
+        } else if let id, !answered {
+            Task { try? await CallAPI().reject(id: id, reason: "铃响时按掉了") }
+        }
+    }
+
+    func setMuted(_ muted: Bool) { model?.setMuted(muted) }
+
+    func systemAudioActivated() {
+        systemAudioActive = true
+        model?.systemAudioReady()
+    }
+
+    func systemAudioDeactivated() { systemAudioActive = false }
+
+    /// 长按电话键的测试:几秒后系统来电。系统在 App 前台时不弹来电界面,按完要马上锁屏或回桌面;
+    /// 后台任务让 App 撑到响铃那一刻
+    func scheduleTestCall(after seconds: Double = 6) {
+        endKeepAlive()
+        keepAlive = UIApplication.shared.beginBackgroundTask { [weak self] in
+            Task { @MainActor in self?.endKeepAlive() }
+        }
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            NativeCallCenter.shared.ringTest { message in
+                Task { @MainActor in
+                    self?.notice = message
+                    self?.endKeepAlive()
+                }
+            }
+        }
+    }
+
+    private func endKeepAlive() {
+        guard keepAlive != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(keepAlive)
+        keepAlive = .invalid
     }
 }

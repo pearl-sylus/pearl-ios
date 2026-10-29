@@ -29,6 +29,9 @@ final class CallViewModel: ObservableObject {
     private var startedAt: Date?
     private let lingerSeconds: UInt64 = 12
     private var audioSink: AnyCancellable?
+    /// 10.30 系统(CallKit)接起来的电话:声音会话由系统打开,打开了才能起麦;结束时要告诉系统收起通话界面
+    private(set) var systemUUID: UUID?
+    private var micStarted = false
 
     init(callId: String) {
         self.callId = callId
@@ -45,6 +48,7 @@ final class CallViewModel: ObservableObject {
     }
 
     func load() async {
+        guard phase == .loading else { return }   // 系统接起来的电话页面出现前就已经在通了,别打回响铃
         do {
             let record = try await api.call(id: callId)
             reason = record.reason ?? ""
@@ -80,6 +84,40 @@ final class CallViewModel: ObservableObject {
         }
     }
 
+    /// 10.30 锁屏/系统来电界面上接的:等系统把声音会话打开(audioReady 或之后 systemAudioReady)再起麦、他开口
+    func answerViaSystem(uuid: UUID, audioReady: Bool) {
+        guard phase == .loading || phase == .ringing else { return }
+        systemUUID = uuid
+        audio.systemManaged = true
+        phase = .connecting
+        state = "接通了，他开口中…"
+        if audioReady { systemAudioReady() }
+    }
+
+    func systemAudioReady() {
+        guard systemUUID != nil, phase == .connecting, !micStarted else { return }
+        micStarted = true
+        Task {
+            do {
+                try audio.startMic()
+            } catch {
+                phase = .failed
+                state = "拿不到麦克风，去设置里允许"
+                endSystemCall(failed: true)
+                return
+            }
+            try? await api.answer(id: callId)
+            startTimer()
+            await run(api.open(id: callId), isOpen: true)
+        }
+    }
+
+    /// 系统通话界面上点了静音
+    func setMuted(_ muted: Bool) {
+        audio.muted = muted
+        if phase == .live || phase == .lingering { state = muted ? "你静音了" : "在听你…" }
+    }
+
     func reject(_ why: String) {
         Task { try? await api.reject(id: callId, reason: why) }
         phase = .ended
@@ -101,6 +139,22 @@ final class CallViewModel: ObservableObject {
         finish(message: "你挂了电话。")
     }
 
+    /// 系统那边已经挂了(锁屏上按的红键):这边收尾,不用再回报系统
+    func hangUpFromSystem() {
+        systemUUID = nil
+        if phase == .ringing || phase == .loading {
+            reject("铃响时按掉了")
+        } else {
+            finish(message: "你挂了电话。")
+        }
+    }
+
+    private func endSystemCall(failed: Bool = false) {
+        guard let uuid = systemUUID else { return }
+        systemUUID = nil
+        NativeCallCenter.shared.reportEnded(uuid: uuid, failed: failed)
+    }
+
     private func finish(message: String) {
         guard phase != .ended else { return }
         phase = .ended
@@ -108,6 +162,7 @@ final class CallViewModel: ObservableObject {
         lingerTask?.cancel()
         timer?.invalidate()
         audio.stopAll()
+        endSystemCall()
         Task { try? await api.end(id: callId) }
     }
 
