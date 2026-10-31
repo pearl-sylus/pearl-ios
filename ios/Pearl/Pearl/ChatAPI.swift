@@ -60,7 +60,7 @@ struct ChatAPI {
         return id
     }
 
-    func send(text: String, clientID: String, images: [Data] = [], voice: VoiceMeta? = nil) async throws -> SendResponse {
+    func send(text: String, clientID: String, images: [Data] = [], voice: VoiceMeta? = nil, quote: QuoteMeta? = nil) async throws -> SendResponse {
         var body: [String: Any] = [
             "text": text,
             "clientId": clientID,
@@ -68,6 +68,9 @@ struct ChatAPI {
         ]
         if !images.isEmpty {
             body["images"] = images.prefix(3).map { ["media_type": "image/jpeg", "data": $0.base64EncodedString()] }
+        }
+        if let quote, let id = quote.id, !id.isEmpty {
+            body["quote"] = ["id": id, "text": quote.text ?? ""]   // 10.25 引用:服务端 tools/quote.js 核 id 和原句
         }
         if let voice {
             body["voice"] = [

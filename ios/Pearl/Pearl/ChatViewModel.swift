@@ -18,6 +18,7 @@ final class ChatViewModel: NSObject, ObservableObject {
         didSet { UserDefaults.standard.set(draft, forKey: "chat-draft") }
     }
     @Published var pendingImages: [PendingImage] = []
+    @Published var pendingQuote: QuoteMeta?   // 11.1 引用回复:长按某条→引用,随下一句发出去
     @Published var pendingVoice: VoiceMeta?
     @Published var hasMore = false
     @Published var hasNewer = false
@@ -157,6 +158,15 @@ final class ChatViewModel: NSObject, ObservableObject {
         draft = message.body
     }
 
+    func quote(_ message: ChatMessage) {
+        let flat = message.body.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !flat.isEmpty else { return }
+        pendingQuote = QuoteMeta(id: message.id, role: message.isMine ? "user" : "assistant", text: String(flat.prefix(60)))
+    }
+
+    func clearQuote() { pendingQuote = nil }
+
     func presentation(for text: String) -> RichTextPresentation {
         presentations[text] ?? RichTextPresentation(text)
     }
@@ -170,7 +180,7 @@ final class ChatViewModel: NSObject, ObservableObject {
         guard !text.isEmpty || !pendingImages.isEmpty || pendingVoice != nil else { return }
         if hasNewer { await goLatest() }
 
-        let signature = text + "|" + pendingImages.map { $0.id.uuidString }.joined() + "|" + (pendingVoice?.file ?? "")
+        let signature = text + "|" + pendingImages.map { $0.id.uuidString }.joined() + "|" + (pendingVoice?.file ?? "") + "|" + (pendingQuote?.id ?? "")
         let ticket: String
         if let pending = sendTicket, pending.signature == signature {
             ticket = pending.id
@@ -184,11 +194,13 @@ final class ChatViewModel: NSObject, ObservableObject {
             let response = try await api.send(text: text,
                                               clientID: ticket,
                                               images: pendingImages.map(\.data),
-                                              voice: pendingVoice)
+                                              voice: pendingVoice,
+                                              quote: pendingQuote)
             sendTicket = nil
             draft = ""
             pendingImages = []
             pendingVoice = nil
+            pendingQuote = nil
             if !messages.contains(where: { $0.id == response.message.id }) {
                 cachePresentations(in: [response.message])
                 messages.append(response.message)

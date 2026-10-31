@@ -87,6 +87,22 @@ struct Composer: View {
     }
 
     @ViewBuilder private var attachments: some View {
+        if let quote = model.pendingQuote {
+            HStack(spacing: Theme.Metric.compact) {
+                Image(systemName: "quote.opening")
+                Text("\(quote.who)：\(quote.text ?? "")").lineLimit(1)
+                Spacer(minLength: Theme.Metric.zero)
+                Button { model.clearQuote() } label: { Image(systemName: "xmark.circle.fill") }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("取消引用")
+            }
+            .font(theme.font(.metadata))
+            .foregroundStyle(theme.metaText)
+            .padding(.horizontal, Theme.Metric.standard)
+            .padding(.vertical, Theme.Metric.small)
+            .background(theme.embeddedCardFill(), in: RoundedRectangle(cornerRadius: Theme.Metric.toolRadius))
+            .padding(.top, Theme.Metric.small)
+        }
         if !model.pendingImages.isEmpty {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Theme.Metric.standard) {
