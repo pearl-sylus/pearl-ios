@@ -167,7 +167,15 @@ private struct MessageRow: View {
                 ThinkBlock(text: thought, cut: message.thinkCut)
             }
 
+            if let bell = message.bell, let phrase = bell.phrase, !phrase.isEmpty {
+                BellLine(bell: bell, mine: message.isMine)
+            }
+
             messageBody
+
+            if let quote = message.quote, let qt = quote.text, !qt.isEmpty {
+                QuoteRef(quote: quote, mine: message.isMine)
+            }
 
             HStack(spacing: Theme.Metric.compact) {
                 if message.kind == "push" { Label("推送到了你手机", systemImage: "megaphone") }
@@ -194,6 +202,9 @@ private struct MessageRow: View {
         .frame(maxWidth: .infinity, alignment: message.isMine ? .trailing : .leading)
         .contextMenu {
             if !message.body.isEmpty {
+                Button { model.quote(message) } label: {
+                    Label("引用", systemImage: "quote.opening")
+                }
                 Button { UIPasteboard.general.string = message.body } label: {
                     Label("复制", systemImage: "doc.on.doc")
                 }
@@ -254,6 +265,51 @@ private struct MessageRow: View {
 
     private func clock(_ milliseconds: Double) -> String {
         Date(timeIntervalSince1970: milliseconds / 1_000).formatted(.dateTime.hour().minute())
+    }
+}
+
+// 10.11 摇铃铛:一行居中小字(她定:只要一行字,不要空气泡)
+private struct BellLine: View {
+    @EnvironmentObject private var theme: Theme
+    let bell: BellMeta
+    let mine: Bool
+
+    var body: some View {
+        HStack(spacing: Theme.Metric.compact) {
+            Image(systemName: "bell.fill")
+            Text(bell.label ?? ((bell.by ?? (mine ? "你" : "他")) + "摇了铃铛"))
+            Text("“\(bell.phrase ?? "")”").foregroundStyle(theme.bubbleText)
+        }
+        .font(theme.font(.metadata))
+        .foregroundStyle(theme.accent)
+        .lineLimit(2)
+        .padding(.horizontal, Theme.Metric.roomy)
+        .padding(.vertical, Theme.Metric.small)
+        .background(theme.accent.opacity(0.10), in: Capsule())
+        .frame(maxWidth: .infinity, alignment: mine ? .trailing : .leading)
+    }
+}
+
+// 10.25 引用回复:气泡下面一条小字,写明这句是接着哪句说的
+private struct QuoteRef: View {
+    @EnvironmentObject private var theme: Theme
+    let quote: QuoteMeta
+    let mine: Bool
+
+    var body: some View {
+        HStack(alignment: .top, spacing: Theme.Metric.compact) {
+            RoundedRectangle(cornerRadius: Theme.Metric.thinLine)
+                .fill(theme.accent.opacity(0.6))
+                .frame(width: Theme.Metric.tiny)
+            Text("\(quote.who)：\(quote.text ?? "")")
+                .font(theme.font(.metadata))
+                .foregroundStyle(theme.metaText)
+                .lineLimit(2)
+        }
+        .padding(.horizontal, Theme.Metric.standard)
+        .padding(.vertical, Theme.Metric.small)
+        .background(theme.embeddedCardFill(), in: RoundedRectangle(cornerRadius: Theme.Metric.toolRadius))
+        .frame(maxWidth: Theme.Metric.bubbleMaxWidth, alignment: mine ? .trailing : .leading)
     }
 }
 

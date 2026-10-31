@@ -28,6 +28,22 @@ struct CallMeta: Decodable, Hashable {
     let turns: [CallTurn]?
 }
 
+// 10.25 网页加的引用回复:她长按哪一条回的(id/role/text 由服务端核过)
+struct QuoteMeta: Codable, Hashable {
+    let id: String?
+    let role: String?
+    let text: String?
+    var who: String { role == "user" ? "你" : "他" }
+}
+
+// 10.11 网页加的摇铃铛:挂在消息上的一行动作,不是气泡
+struct BellMeta: Decodable, Hashable {
+    let count: Int?
+    let phrase: String?
+    let label: String?
+    let by: String?
+}
+
 struct ChatMessage: Decodable, Identifiable, Hashable {
     let id: String
     let at: Double
@@ -50,6 +66,8 @@ struct ChatMessage: Decodable, Identifiable, Hashable {
     let cache: Int?
     let hr: Int?
     let thinkCut: String?
+    let quote: QuoteMeta?
+    let bell: BellMeta?
 
     var isMine: Bool { role == "user" }
     var body: String { text ?? "" }
